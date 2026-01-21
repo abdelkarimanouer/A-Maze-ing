@@ -2,7 +2,7 @@ import sys
 
 
 def file_parsing(file_name: str) -> dict:
-    configuration = {}
+    config = {}
 
     try:
         with open(file_name, 'r') as file:
@@ -17,49 +17,23 @@ def file_parsing(file_name: str) -> dict:
                     sys.exit(1)
 
                 key, value = line.split("=")
-                configuration[key] = value
+                config[key] = value
 
     except FileNotFoundError as error:
         print(f"ERROR: {error}")
         sys.exit(1)
-    return configuration
+    return config
 
 
-def check_values(width: int, height: int, entry: tuple, exit: tuple) -> None:
-
-    if width <= 0 or height <= 0:
-        print("ERROR: invalid maze size")
-        sys.exit(1)
-
-    if (
-        entry[0] > width or entry[0] < 0 or
-        entry[1] > height or entry[1] < 0
-    ):
-        print("ERROR: the ENTRY point is out of the maze")
-        sys.exit(1)
-
-    if (
-        exit[0] > width or exit[0] < 0 or
-        exit[1] > height or exit[1] < 0
-    ):
-        print("ERROR: the EXIT point is out of the maze")
-        sys.exit(1)
-
-    if entry == exit:
-        print("ERROR: ENTRY and EXIT is the same")
-        sys.exit(1)
-
-
-def config_parsing(configuration: dict):
+def config_parsing(config: dict):
     try:
-        width = int(configuration["WIDTH"])
-        height = int(configuration["HEIGHT"])
+        config["WIDTH"] = int(config["WIDTH"])
+        config["HEIGHT"] = int(config["HEIGHT"])
 
-        entry = tuple(map(int, configuration["ENTRY"].split(",")))
-        exit = tuple(map(int, configuration["EXIT"].split(",")))
+        config["ENTRY"] = tuple(map(int, config["ENTRY"].split(",")))
+        config["EXIT"] = tuple(map(int, config["EXIT"].split(",")))
 
-        output_file = configuration["OUTPUT_FILE"]
-        perfect = configuration["PERFECT"].upper() == "TRUE"
+        config["PERFECT"] = config["PERFECT"].upper() == "TRUE"
 
     except ValueError as error:
         print(f"ERROR: {error}")
@@ -68,6 +42,29 @@ def config_parsing(configuration: dict):
         print(f"ERROR: Key {error} not found")
         sys.exit(1)
 
-    check_values(width, height, entry, exit)
+    if config["WIDTH"] <= 0 or config["HEIGHT"] <= 0:
+        print("ERROR: invalid maze size")
+        sys.exit(1)
 
-    return width, height, entry, exit, output_file, perfect
+    e_x, e_y = config["ENTRY"]
+    x_x, x_y = config["EXIT"]
+
+    if (
+        e_x > config["WIDTH"] or e_x < 0 or
+        e_y > config["HEIGHT"] or e_y < 0
+    ):
+        print("ERROR: the ENTRY point is out of the maze")
+        sys.exit(1)
+
+    if (
+        x_x > config["WIDTH"] or x_x < 0 or
+        x_y > config["HEIGHT"] or x_y < 0
+    ):
+        print("ERROR: the EXIT point is out of the maze")
+        sys.exit(1)
+
+    if config["ENTRY"] == config["EXIT"]:
+        print("ERROR: ENTRY and EXIT is the same")
+        sys.exit(1)
+
+    return config

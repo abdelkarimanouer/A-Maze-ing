@@ -62,11 +62,10 @@ if __name__ == "__main__":
 
     configuration = file_parsing(sys.argv[1])
 
-    width, height, entry, exit, output_file, perfect = config_parsing(
-        configuration)
+    config = config_parsing(configuration)
 
-    maze = Maze(width, height)
-    maze.maze_generator(entry)
+    maze = Maze(config["WIDTH"], config["HEIGHT"])
+    maze.maze_generator(config["ENTRY"])
     for _ in maze.maze_struct:
         for c in _:
             print(format(c.wall, 'X'), end="")
