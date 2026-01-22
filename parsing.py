@@ -17,7 +17,7 @@ def file_parsing(file_name: str) -> dict:
                     sys.exit(1)
 
                 key, value = line.split("=")
-                config[key.rstrip()] = value.rstrip()
+                config[key.strip()] = value.strip()
 
     except FileNotFoundError as error:
         print(f"ERROR: {error}")
@@ -46,19 +46,27 @@ def config_parsing(config: dict):
         print("ERROR: invalid maze size")
         sys.exit(1)
 
+    if len(config["ENTRY"]) != 2:
+        print("ERROR: invalid ENTRY")
+        sys.exit(1)
+
+    if len(config["EXIT"]) != 2:
+        print("ERROR: invalid EXIT")
+        sys.exit(1)
+
     e_x, e_y = config["ENTRY"]
     x_x, x_y = config["EXIT"]
 
     if (
-        e_x > config["WIDTH"] or e_x < 0 or
-        e_y > config["HEIGHT"] or e_y < 0
+        e_x >= config["WIDTH"] or e_x < 0 or
+        e_y >= config["HEIGHT"] or e_y < 0
     ):
         print("ERROR: the ENTRY point is out of the maze")
         sys.exit(1)
 
     if (
-        x_x > config["WIDTH"] or x_x < 0 or
-        x_y > config["HEIGHT"] or x_y < 0
+        x_x >= config["WIDTH"] or x_x < 0 or
+        x_y >= config["HEIGHT"] or x_y < 0
     ):
         print("ERROR: the EXIT point is out of the maze")
         sys.exit(1)
@@ -66,5 +74,7 @@ def config_parsing(config: dict):
     if config["ENTRY"] == config["EXIT"]:
         print("ERROR: ENTRY and EXIT is the same")
         sys.exit(1)
+    
+    # if 
 
     return config

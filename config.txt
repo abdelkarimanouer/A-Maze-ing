@@ -1,7 +1,0 @@
-WIDTH=15
-HEIGHT=10
-ENTRY=0,0
-#comment
-EXIT=15,10    
-OUTPUT_FILE=maze.txt
-PERFECT=True

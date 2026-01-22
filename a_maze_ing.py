@@ -66,7 +66,8 @@ if __name__ == "__main__":
 
     maze = Maze(config["WIDTH"], config["HEIGHT"])
     maze.maze_generator(config["ENTRY"])
-    for _ in maze.maze_struct:
-        for c in _:
-            print(format(c.wall, 'X'), end="")
-        print()
+    with open(config['OUTPUT_FILE'], "a") as maze_file:
+        for _ in maze.maze_struct:
+            for c in _:
+                maze_file.write(format(c.wall, 'X'))
+            maze_file.write("\n")
