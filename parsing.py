@@ -17,7 +17,7 @@ def file_parsing(file_name: str) -> dict:
                     sys.exit(1)
 
                 key, value = line.split("=")
-                config[key] = value
+                config[key.rstrip()] = value.rstrip()
 
     except FileNotFoundError as error:
         print(f"ERROR: {error}")
