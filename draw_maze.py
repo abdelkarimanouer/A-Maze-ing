@@ -3,17 +3,17 @@ import curses as cs
 
 def draw_board(window: cs.window, width: int, height: int):
 
-    window.addch(1, 0, '┏')
+    window.addch(0, 0, '┏')
     window.addch(0, width, '┓')
-    window.addch(height, 1, '┗')
+    window.addch(height, 0, '┗')
     window.addch(height, width, '┛')
 
-    for c in range(2, width):
-        window.addch(1, c, '━')
+    for c in range(1, width):
+        window.addch(0, c, '━')
         window.addch(height, c, '━')
 
-    for r in range(2, height):
-        window.addch(r, 1, '┃')
+    for r in range(1, height):
+        window.addch(r, 0, '┃')
         window.addch(r, width, '┃')
 
 
