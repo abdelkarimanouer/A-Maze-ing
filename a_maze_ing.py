@@ -1,6 +1,7 @@
 import random
 import sys
 from parsing import file_parsing, config_parsing
+from draw_maze import draw_waze
 
 
 bin_value = {'s': 1, 'w': 2, 'n': 4, 'e': 8}
@@ -54,7 +55,7 @@ class Maze:
                 self.maze_generator([next_x, next_y])
 
 
-if __name__ == "__main__":
+def main():
 
     if len(sys.argv) != 2:
         print("ERROR: (python3 a_maze_ing.py <config.txt>)")
@@ -66,8 +67,16 @@ if __name__ == "__main__":
 
     maze = Maze(config["WIDTH"], config["HEIGHT"])
     maze.maze_generator(config["ENTRY"])
+
+    open(config['OUTPUT_FILE'], "w").close()
     with open(config['OUTPUT_FILE'], "a") as maze_file:
         for _ in maze.maze_struct:
             for c in _:
                 maze_file.write(format(c.wall, 'X'))
             maze_file.write("\n")
+
+    draw_waze()
+
+
+if __name__ == "__main__":
+    main()
