@@ -6,7 +6,6 @@ def draw_waze(maze_lines: list[str], config: dict):
         cs.curs_set(0)
         window.clear()
 
-
         width = config['WIDTH'] * 3
         height = config['HEIGHT'] * 3
 
