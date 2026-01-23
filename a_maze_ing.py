@@ -1,7 +1,7 @@
 import random
 import sys
 from parsing import file_parsing, config_parsing
-from draw_maze import draw_waze
+from draw_maze import display_maze
 
 
 bin_value = {'s': 1, 'w': 2, 'n': 4, 'e': 8}
@@ -79,7 +79,7 @@ def main():
         maze_file.seek(0)
         maze_lines = maze_file.readlines()
 
-    draw_waze(maze_lines, config)
+    display_maze(maze_lines, config)
 
 
 if __name__ == "__main__":
