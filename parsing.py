@@ -74,7 +74,5 @@ def config_parsing(config: dict):
     if config["ENTRY"] == config["EXIT"]:
         print("ERROR: ENTRY and EXIT is the same")
         sys.exit(1)
-    
-    # if 
 
     return config

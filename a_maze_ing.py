@@ -67,15 +67,19 @@ def main():
 
     maze = Maze(config["WIDTH"], config["HEIGHT"])
     maze.maze_generator(config["ENTRY"])
+    maze_lines: list[str] = []
 
     open(config['OUTPUT_FILE'], "w").close()
-    with open(config['OUTPUT_FILE'], "a") as maze_file:
+    with open(config['OUTPUT_FILE'], "a+") as maze_file:
         for _ in maze.maze_struct:
             for c in _:
                 maze_file.write(format(c.wall, 'X'))
             maze_file.write("\n")
 
-    draw_waze()
+        maze_file.seek(0)
+        maze_lines = maze_file.readlines()
+
+    draw_waze(maze_lines, config)
 
 
 if __name__ == "__main__":
