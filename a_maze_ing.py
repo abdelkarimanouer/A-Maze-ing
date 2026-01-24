@@ -4,7 +4,7 @@ from parsing import file_parsing, config_parsing
 from draw_maze import display_maze
 
 
-bin_value = {'s': 1, 'w': 2, 'n': 4, 'e': 8}
+bin_value = {'n': 1, 'e': 2, 's': 4, 'w': 8}
 directions = ['s', 'w', 'n', 'e']
 y_axis = {'s': 1, 'w': 0, 'n': -1, 'e': 0}
 x_axis = {'s': 0, 'w': -1, 'n': 0, 'e': 1}
