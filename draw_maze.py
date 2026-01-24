@@ -7,12 +7,13 @@ def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
         return {'east': False, 'north': False, 'west': False, 'south': False}
     if row >= len(maze_lines):
         return {'east': False, 'north': False, 'west': False, 'south': False}
-    if col >= len(maze_lines[row]):
+    line = maze_lines[row].strip()
+    if col >= len(line):
         return {'east': False, 'north': False, 'west': False, 'south': False}
     else:
         line = maze_lines[row].strip()
-        hex = line[col]
-        v = int(hex, 16)
+        char_h = line[col]
+        v = int(char_h, 16)
         directions['north'] = bool(v & 1)
         directions['east'] = bool(v & 2)
         directions['south'] = bool(v & 4)
@@ -20,37 +21,64 @@ def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
         return directions
 
 
+def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
+    top_left = get_cell_walls(cy - 1, cx - 1, maze_lines)
+    top_right = get_cell_walls(cy - 1, cx, maze_lines)
+    bottom_left = get_cell_walls(cy, cx - 1, maze_lines)
+    bottom_right = get_cell_walls(cy, cx, maze_lines)
+
+    up = top_left['east'] or top_right['west']
+    down = bottom_left['east'] or bottom_right['west']
+    left = top_left['south'] or bottom_left['north']
+    right = top_right['south'] or bottom_right['north']
+
+    return {'up': up, 'down': down, 'left': left, 'right': right}
+
+
+def get_corner_char(up: bool, down: bool, left: bool, right: bool) -> str:
+    char_map = {
+        (True, True, True, True): '╋',
+        (True, True, True, False): '┫',
+        (True, True, False, True): '┣',
+        (False, True, True, True): '┳',
+        (True, False, True, True): '┻',
+        (True, True, False, False): '┃',
+        (False, False, True, True): '━',
+        (True, False, True, False): '┛',
+        (True, False, False, True): '┗',
+        (False, True, True, False): '┓',
+        (False, True, False, True): '┏',
+        (True, False, False, False): '┃',
+        (False, True, False, False): '┃',
+        (False, False, True, False): '━',
+        (False, False, False, True): '━',
+        (False, False, False, False): ' '
+    }
+    return char_map.get((up, down, left, right), ' ')
+
+
 def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
                   height: int) -> None:
 
-    for y, line in enumerate(maze_lines):
-        line = line.strip()
-        for x, char in enumerate(line):
-            v = int(char, 16)
-            north = v & 1
-            east = v & 2
-            south = v & 4
-            west = v & 8
+    corner_rows = height + 1
+    corner_cols = width + 1
 
-            start_y = (y * 3)
-            start_x = (x * 3)
-            if east:
-                window.addch(start_y + 1, start_x + 2, '┃')
-            if west:
-                window.addch(start_y + 1, start_x, '┃')
-            if north:
-                window.addch(start_y, start_x + 1, '━')
-            if south:
-                window.addch(start_y + 2, start_x + 1, '━')
+    for cy in range(corner_rows):
+        for cx in range(corner_cols):
+            walls = get_corner_walls(cy, cx, maze_lines)
+            char = get_corner_char(walls['up'], walls['down'],
+                                   walls['left'], walls['right'])
+            screen_y = cy * 3
+            screen_x = cx * 3
+            window.addch(screen_y, screen_x, char)
 
-            if north and west:
-                window.addch(start_y, start_x, '┏')
-            if north and east:
-                window.addch(start_y, start_x + 2, '┓')
-            if south and west:
-                window.addch(start_y + 2, start_x, '┗')
-            if south and east:
-                window.addch(start_y + 2, start_x + 2, '┛')
+            if walls['right'] and cx < width:
+                window.addch(screen_y, screen_x + 1, '━')
+                window.addch(screen_y, screen_x + 2, '━')
+
+            if walls['down'] and cy < height:
+                window.addch(screen_y + 1, screen_x, '┃')
+                window.addch(screen_y + 2, screen_x, '┃')
 
 
 def display_maze(maze_lines: list[str], config: dict) -> None:
@@ -58,10 +86,10 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
         cs.curs_set(0)
         window.clear()
 
-        width = config['WIDTH'] * 3
-        height = config['HEIGHT'] * 3
+        maze_width = config['WIDTH']
+        maze_height = config['HEIGHT']
 
-        draw_the_maze(window, maze_lines, width, height)
+        draw_the_maze(window, maze_lines, maze_width, maze_height)
 
         window.refresh()
         window.getch()
