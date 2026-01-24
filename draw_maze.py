@@ -81,6 +81,18 @@ def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
                 window.addch(screen_y + 2, screen_x, '┃')
 
 
+def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
+    entry_x, entry_y = entry
+    entry_screen_y = (entry_y * 3) + 1
+    entry_screen_x = (entry_x * 3) + 1
+    window.addch(entry_screen_y, entry_screen_x, '🏁')
+
+    exit_x, exit_y = exit
+    exit_screen_y = (exit_y * 3) + 1
+    exit_screen_x = (exit_x * 3) + 1
+    window.addch(exit_screen_y, exit_screen_x, '🚩')
+
+
 def display_maze(maze_lines: list[str], config: dict) -> None:
     def draw(window: cs.window) -> None:
         cs.curs_set(0)
@@ -88,8 +100,11 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
 
         maze_width = config['WIDTH']
         maze_height = config['HEIGHT']
+        maze_entry = config['ENTRY']
+        maze_exit = config['EXIT']
 
         draw_the_maze(window, maze_lines, maze_width, maze_height)
+        draw_entry_exit(window, maze_entry, maze_exit)
 
         window.refresh()
         window.getch()
