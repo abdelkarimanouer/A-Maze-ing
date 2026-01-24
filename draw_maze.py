@@ -2,6 +2,11 @@ import curses as cs
 
 
 def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
+    """
+    Checks which walls exist for a cell at given position.
+    Returns dictionary with 4 directions (north, east, south, west).
+    Each direction is True if wall exists, False if not.
+    """
     directions = dict()
     if row < 0 or col < 0:
         return {'east': False, 'north': False, 'west': False, 'south': False}
@@ -22,6 +27,11 @@ def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
 
 
 def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
+    """
+    Checks walls around a corner point where 4 cells meet.
+    Looks at all 4 cells around the corner.
+    Returns which walls connect to this corner point.
+    """
     top_left = get_cell_walls(cy - 1, cx - 1, maze_lines)
     top_right = get_cell_walls(cy - 1, cx, maze_lines)
     bottom_left = get_cell_walls(cy, cx - 1, maze_lines)
@@ -36,6 +46,11 @@ def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
 
 
 def get_corner_char(up: bool, down: bool, left: bool, right: bool) -> str:
+    """
+    Returns the correct box drawing character for a corner.
+    Chooses character based on which walls connect to it.
+    Uses special Unicode characters to draw smooth lines.
+    """
     char_map = {
         (True, True, True, True): '╋',
         (True, True, True, False): '┫',
@@ -59,7 +74,11 @@ def get_corner_char(up: bool, down: bool, left: bool, right: bool) -> str:
 
 def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
                   height: int) -> None:
-
+    """
+    Draws the maze walls on the screen using box characters.
+    Each cell takes 3x3 spaces on screen for better visibility.
+    Connects all corners and walls to make complete maze.
+    """
     corner_rows = height + 1
     corner_cols = width + 1
 
@@ -82,6 +101,11 @@ def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
 
 
 def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
+    """
+    Places entry and exit markers on the maze.
+    Entry is marked with flag emoji 🏁.
+    Exit is marked with flag emoji 🚩.
+    """
     entry_x, entry_y = entry
     entry_screen_y = (entry_y * 3) + 1
     entry_screen_x = (entry_x * 3) + 1
@@ -94,6 +118,11 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
 
 
 def display_maze(maze_lines: list[str], config: dict) -> None:
+    """
+    Main function to display the complete maze on terminal.
+    Uses curses library to draw maze with walls and markers.
+    Waits for key press before closing.
+    """
     def draw(window: cs.window) -> None:
         cs.curs_set(0)
         window.clear()

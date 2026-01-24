@@ -12,15 +12,31 @@ rev_directions = {'s': 'n', 'w': 'e', 'n': 's', 'e': 'w'}
 
 
 class Cell:
+    """
+    Represents a single cell in the maze.
+    Each cell has walls and a visited status.
+    """
 
     def __init__(self):
+        """
+        Creates a new cell.
+        Sets all 4 walls and marks cell as not visited.
+        """
         self.wall = 15
         self.visited = False
 
 
 class Maze:
+    """
+    Represents the maze grid.
+    Contains cells and methods to generate the maze.
+    """
 
     def __init__(self, width, height):
+        """
+        Creates a new maze with given size.
+        Fills the maze with cell objects.
+        """
         self.width = width
         self.height = height
         self.maze_struct = [
@@ -28,6 +44,10 @@ class Maze:
         ]
 
     def maze_generator(self, entry):
+        """
+        Generates the maze using recursive backtracking.
+        Starts from entry point and carves paths randomly.
+        """
         x, y = entry
         curent = self.maze_struct[y][x]
         curent.visited = True

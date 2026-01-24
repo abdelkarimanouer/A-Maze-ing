@@ -2,6 +2,11 @@ import sys
 
 
 def file_parsing(file_name: str) -> dict:
+    """
+    Reads a config file and returns its content as dictionary.
+    Skips comment lines that start with #.
+    Exits if file not found or line is invalid.
+    """
     config = {}
 
     try:
@@ -25,7 +30,12 @@ def file_parsing(file_name: str) -> dict:
     return config
 
 
-def config_parsing(config: dict):
+def config_parsing(config: dict) -> dict:
+    """
+    Validates and converts config values to correct types.
+    Checks if maze size, entry and exit points are valid.
+    Exits if any value is wrong or missing.
+    """
     try:
         config["WIDTH"] = int(config["WIDTH"])
         config["HEIGHT"] = int(config["HEIGHT"])
