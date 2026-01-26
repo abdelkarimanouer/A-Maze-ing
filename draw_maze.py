@@ -117,7 +117,7 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
     window.addch(exit_screen_y, exit_screen_x, '🚩')
 
 
-def draw_a_maz_ing_header(window: cs.window) -> None:
+def draw_a_maze_ing_header(window: cs.window) -> None:
 
     header = """
 ******************************************************************\
@@ -151,15 +151,29 @@ __|     |_____||_____|\\____|`._____.'      *
 ******************************************************************\
 ****************************************** *
 """
+    window.timeout(200)
+
     max_y, max_x = window.getmaxyx()
     lines = header.split('\n')
     header_width = max(len(line) for line in lines)
     start_x = (max_x - header_width) // 2
     start_y = 0
-    for i, line in enumerate(lines):
-        if line.strip():
-            window.addstr(start_y + i, start_x, line, cs.A_BOLD)
+    show = True
+
+    while True:
+        window.clear()
+        if show:
+            for i, line in enumerate(lines):
+                if line.strip():
+                    window.addstr(start_y + i, start_x, line, cs.A_BOLD)
         window.refresh()
+        cs.napms(300)
+        if window.getch() != -1:
+            break
+        show = not show
+
+    window.timeout(-1)
+    window.clear()
 
 
 def dislay_menu(window: cs.window):
@@ -176,10 +190,7 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
         cs.curs_set(0)
         window.clear()
 
-        draw_a_maz_ing_header(window)
-        window.refresh()
-        window.getch()
-        window.clear()
+        draw_a_maze_ing_header(window)
 
         maze_width = config['WIDTH']
         maze_height = config['HEIGHT']
