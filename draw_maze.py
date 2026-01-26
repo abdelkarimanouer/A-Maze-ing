@@ -117,6 +117,30 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
     window.addch(exit_screen_y, exit_screen_x, '🚩')
 
 
+def draw_a_maz_ing_header(window: cs.window) -> None:
+
+    HEADER = """
+          **************************************************************************************************************
+          *                                                                                                            *
+          *                                                                                                            *
+          *           _          ____    ____       _       ________  ________       _____  ____  _____   ______       *
+          *          / \        |_   \  /   _|     / \     |  __   _||_   __  |     |_   _||_   \|_   _|.' ___  |      *
+          *         / _ \  ______ |   \/   |      / _ \    |_/  / /    | |_ \_|______ | |    |   \ | | / .'   \_|      *
+          *        / ___ \|______|| |\  /| |     / ___ \      .'.' _   |  _| _|______|| |    | |\ \| | | |   ____      *
+          *      _/ /   \ \_     _| |_\/_| |_  _/ /   \ \_  _/ /__/ | _| |__/ |      _| |_  _| |_\   |_\ `.___]  |     *
+          *     |____| |____|   |_____||_____||____| |____||________||________|     |_____||_____|\____|`._____.'      *
+          *                                                                                                            *
+          *                                                                                                            *
+          *                                     Developed by: aanouer and achouaf                                      *
+          *                                                                                                            *
+          ************************************************************************************************************ *
+"""
+    lines = HEADER.split('\n')
+    for y, line in enumerate(lines):
+        if line.strip():
+            window.addstr(y, 0, line)
+
+
 def display_maze(maze_lines: list[str], config: dict) -> None:
     """
     Main function to display the complete maze on terminal.
@@ -125,6 +149,11 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
     """
     def draw(window: cs.window) -> None:
         cs.curs_set(0)
+        window.clear()
+
+        draw_a_maz_ing_header(window)
+        window.refresh()
+        window.getch()
         window.clear()
 
         maze_width = config['WIDTH']
