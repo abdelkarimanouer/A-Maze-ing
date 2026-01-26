@@ -119,32 +119,57 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
 
 def draw_a_maz_ing_header(window: cs.window) -> None:
 
-    HEADER = """
-          **************************************************************************************************************
-          *                                                                                                            *
-          *                                                                                                            *
-          *           _          ____    ____       _       ________  ________       _____  ____  _____   ______       *
-          *          / \        |_   \  /   _|     / \     |  __   _||_   __  |     |_   _||_   \|_   _|.' ___  |      *
-          *         / _ \  ______ |   \/   |      / _ \    |_/  / /    | |_ \_|______ | |    |   \ | | / .'   \_|      *
-          *        / ___ \|______|| |\  /| |     / ___ \      .'.' _   |  _| _|______|| |    | |\ \| | | |   ____      *
-          *      _/ /   \ \_     _| |_\/_| |_  _/ /   \ \_  _/ /__/ | _| |__/ |      _| |_  _| |_\   |_\ `.___]  |     *
-          *     |____| |____|   |_____||_____||____| |____||________||________|     |_____||_____|\____|`._____.'      *
-          *                                                                                                            *
-          *                                                                                                            *
-          *                                     Developed by: aanouer and achouaf                                      *
-          *                                                                                                            *
-          ************************************************************************************************************ *
+    header = """
+******************************************************************\
+********************************************
+*                                                                 \
+                                           *
+*                                                                 \
+                                           *
+*           _          ____    ____       _       ________  ______\
+__       _____  ____  _____   ______       *
+*          / \\        |_   \\  /   _|     / \\     |  __   _||_\
+   __\
+  |     |_   _||_   \\|_   _|.' ___  |      *
+*         / _ \\  ______ |   \\/   |      / _ \\    |_/  / /    | |_\
+ \\_|______ | |    |   \\ | | / .'   \\_|      *
+*        / ___ \\|______|| |\\  /| |     / ___ \\      .'.' _   |  _\
+| _|______|| |    | |\\ \\| | | |   ____      *
+*      _/ /   \\ \\_     _| |_\\/_| |_  _/ /   \\ \\_  _/ /__/ | _|\
+ |_\
+_/ |      _| |_  _| |_\\   |_\\ `.___]  |     *
+*     |____| |____|   |_____||_____||____| |____||________||______\
+__|     |_____||_____|\\____|`._____.'      *
+*                                                                 \
+                                           *
+*                                                                 \
+                                           *
+*                                     Developed by:\
+ aanouer and achouaf                                      *
+*                                                                 \
+                                           *
+******************************************************************\
+****************************************** *
 """
-    lines = HEADER.split('\n')
-    for y, line in enumerate(lines):
+    max_y, max_x = window.getmaxyx()
+    lines = header.split('\n')
+    header_width = max(len(line) for line in lines)
+    start_x = (max_x - header_width) // 2
+    start_y = 0
+    for i, line in enumerate(lines):
         if line.strip():
-            window.addstr(y, 0, line)
+            window.addstr(start_y + i, start_x, line, cs.A_BOLD)
+        window.refresh()
+
+
+def dislay_menu(window: cs.window):
+    pass
 
 
 def display_maze(maze_lines: list[str], config: dict) -> None:
     """
     Main function to display the complete maze on terminal.
-    Uses curses library to draw maze with walls and markers.
+    Uses curses library to draw header and the maze with walls and markers.
     Waits for key press before closing.
     """
     def draw(window: cs.window) -> None:
