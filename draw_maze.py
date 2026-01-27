@@ -100,7 +100,7 @@ def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
                 window.addch(screen_y + 2, screen_x, '┃')
 
 
-def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
+def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     """
     Places entry and exit markers on the maze.
     Entry is marked with flag emoji 🏁.
@@ -115,6 +115,10 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple):
     exit_screen_y = (exit_y * 3) + 1
     exit_screen_x = (exit_x * 3) + 1
     window.addch(exit_screen_y, exit_screen_x, '🚩')
+
+
+def display_menu(window: cs.window) -> int:
+    pass
 
 
 def draw_a_maze_ing_header(window: cs.window) -> None:
@@ -167,17 +171,12 @@ __|     |_____||_____|\\____|`._____.'      *
                 if line.strip():
                     window.addstr(start_y + i, start_x, line, cs.A_BOLD)
         window.refresh()
-        cs.napms(300)
+        cs.napms(500)
         if window.getch() != -1:
             break
         show = not show
 
     window.timeout(-1)
-    window.clear()
-
-
-def dislay_menu(window: cs.window):
-    pass
 
 
 def display_maze(maze_lines: list[str], config: dict) -> None:
@@ -191,7 +190,9 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
         window.clear()
 
         draw_a_maze_ing_header(window)
+        display_menu(window)
 
+        window.clear()
         maze_width = config['WIDTH']
         maze_height = config['HEIGHT']
         maze_entry = config['ENTRY']
