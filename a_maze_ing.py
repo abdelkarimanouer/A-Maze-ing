@@ -2,6 +2,7 @@ import random
 import sys
 from parsing import file_parsing, config_parsing
 from draw_maze import display_maze
+from collections import deque
 
 
 bin_value = {'n': 1, 'e': 2, 's': 4, 'w': 8}
@@ -43,6 +44,29 @@ class Maze:
             [Cell() for w in range(width)] for h in range(height)
         ]
 
+        if width >= 15 and height >= 15:
+            s_x, s_y = int(width / 2), int(height / 2)
+
+            self.maze_struct[s_y][s_x + 1].visited = True
+            self.maze_struct[s_y][s_x + 2].visited = True
+            self.maze_struct[s_y][s_x + 3].visited = True
+            self.maze_struct[s_y][s_x - 1].visited = True
+            self.maze_struct[s_y][s_x - 2].visited = True
+            self.maze_struct[s_y][s_x - 3].visited = True
+            self.maze_struct[s_y + 1][s_x + 1].visited = True
+            self.maze_struct[s_y + 2][s_x + 1].visited = True
+            self.maze_struct[s_y + 2][s_x + 2].visited = True
+            self.maze_struct[s_y + 2][s_x + 3].visited = True
+            self.maze_struct[s_y + -1][s_x + 3].visited = True
+            self.maze_struct[s_y - 2][s_x + 1].visited = True
+            self.maze_struct[s_y - 2][s_x + 2].visited = True
+            self.maze_struct[s_y - 2][s_x + 3].visited = True
+            self.maze_struct[s_y - 1][s_x - 3].visited = True
+            self.maze_struct[s_y - 2][s_x - 3].visited = True
+            self.maze_struct[s_y + 1][s_x - 1].visited = True
+            self.maze_struct[s_y + 2][s_x - 1].visited = True
+
+
     def maze_generator(self, entry):
         """
         Generates the maze using recursive backtracking.
@@ -75,6 +99,39 @@ class Maze:
                 self.maze_generator([next_x, next_y])
 
 
+    def maze_solver(self, entry, exit):
+        frontier = deque([entry])
+        came_from = {entry: None}
+        while frontier:
+            x, y = frontier.popleft()
+
+            if (x, y) == exit:
+                break
+
+            cell = self.maze_struct[y][x]
+
+            for d, dx, dy, move in [
+                ('n', 0, -1, 'N'),
+                ('s', 0, 1, 'S'),
+                ('e', 1, 0, 'E'),
+                ('w', -1, 0, 'W')
+            ]:
+                if not (cell.wall & bin_value[d]):
+                    nx, ny = x + dx, y + dy
+                    if (nx, ny) not in came_from:
+                        frontier.append((nx, ny))
+                        came_from[(nx, ny)] = ((x, y), move)
+
+        path = ""
+        curent = exit
+
+        while came_from[curent] is not None:
+            curent, move = came_from[curent]
+            path = move + path
+
+        return path
+
+
 def main():
 
     if len(sys.argv) != 2:
@@ -96,8 +153,15 @@ def main():
                 maze_file.write(format(c.wall, 'X'))
             maze_file.write("\n")
 
+        maze_file.write("\n")
+        maze_file.write(str(config["ENTRY"]).strip("()"))
+        maze_file.write("\n")
+        maze_file.write(str(config["EXIT"]).strip("()"))
+        maze_file.write("\n")
+        maze_file.write(maze.maze_solver(config["ENTRY"], config["EXIT"]))
+
         maze_file.seek(0)
-        maze_lines = maze_file.readlines()
+        maze_lines = maze_file.readlines(config["WIDTH"] * config["HEIGHT"])
 
     display_maze(maze_lines, config)
 
