@@ -26,6 +26,7 @@ def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
         return directions
 
 
+
 def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
     """
     Checks walls around a corner point where 4 cells meet.
