@@ -66,7 +66,6 @@ class Maze:
             self.maze_struct[s_y + 1][s_x - 1].visited = True
             self.maze_struct[s_y + 2][s_x - 1].visited = True
 
-
     def maze_generator(self, entry):
         """
         Generates the maze using recursive backtracking.
@@ -97,7 +96,6 @@ class Maze:
                     rev_directions[direction]
                 ]
                 self.maze_generator([next_x, next_y])
-
 
     def maze_solver(self, entry, exit):
         frontier = deque([entry])
