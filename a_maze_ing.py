@@ -131,37 +131,47 @@ class Maze:
 
 
 def main():
+    """
+    Main program entry point.
+    Reads config, generates mazes in loop, displays them until user exits.
+    """
 
     if len(sys.argv) != 2:
         print("ERROR: (python3 a_maze_ing.py <config.txt>)")
         sys.exit(1)
 
     configuration = file_parsing(sys.argv[1])
-
     config = config_parsing(configuration)
 
-    maze = Maze(config["WIDTH"], config["HEIGHT"])
-    maze.maze_generator(config["ENTRY"])
-    maze_lines: list[str] = []
+    while True:
+        maze = Maze(config["WIDTH"], config["HEIGHT"])
+        maze.maze_generator(config["ENTRY"])
+        maze_lines: list[str] = []
 
-    open(config['OUTPUT_FILE'], "w").close()
-    with open(config['OUTPUT_FILE'], "a+") as maze_file:
-        for _ in maze.maze_struct:
-            for c in _:
-                maze_file.write(format(c.wall, 'X'))
+        open(config['OUTPUT_FILE'], "w").close()
+        with open(config['OUTPUT_FILE'], "a+") as maze_file:
+            for _ in maze.maze_struct:
+                for c in _:
+                    maze_file.write(format(c.wall, 'X'))
+                maze_file.write("\n")
+
             maze_file.write("\n")
+            maze_file.write(str(config["ENTRY"]).strip("()"))
+            maze_file.write("\n")
+            maze_file.write(str(config["EXIT"]).strip("()"))
+            maze_file.write("\n")
+            maze_file.write(maze.maze_solver(config["ENTRY"], config["EXIT"]))
 
-        maze_file.write("\n")
-        maze_file.write(str(config["ENTRY"]).strip("()"))
-        maze_file.write("\n")
-        maze_file.write(str(config["EXIT"]).strip("()"))
-        maze_file.write("\n")
-        maze_file.write(maze.maze_solver(config["ENTRY"], config["EXIT"]))
+            maze_file.seek(0)
+            maze_lines = maze_file.readlines(config["WIDTH"] *
+                                             config["HEIGHT"])
 
-        maze_file.seek(0)
-        maze_lines = maze_file.readlines(config["WIDTH"] * config["HEIGHT"])
-
-    display_maze(maze_lines, config)
+        result = display_maze(maze_lines, config)
+        if result == "regenerate":
+            continue
+        elif result == "exit":
+            break
+    exit()
 
 
 if __name__ == "__main__":
