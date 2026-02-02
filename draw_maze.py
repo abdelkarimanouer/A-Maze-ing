@@ -118,7 +118,7 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     window.addch(exit_screen_y, exit_screen_x, '🚩')
 
 
-def display_menu(window: cs.window) -> None:
+def display_menu_with_header(window: cs.window) -> str:
     """
     Shows menu options centered on screen.
     """
@@ -187,7 +187,7 @@ __|     |_____||_____|\\____|`._____.'      *
     window.clear()
     window.nodelay(True)
     while True:
-        display_menu(window)
+        display_menu_with_header(window)
         for i, line in enumerate(lines):
             if line.strip():
                 window.addstr(start_y + i, start_x, line, cs.A_BOLD)
