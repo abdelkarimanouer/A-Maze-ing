@@ -1,4 +1,5 @@
 import curses as cs
+from typing import Union
 
 
 def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
@@ -117,11 +118,31 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     window.addch(exit_screen_y, exit_screen_x, '🚩')
 
 
-def display_menu(window: cs.window) -> int:
-    pass
+def display_menu(window: cs.window) -> None:
+    """
+    Shows menu options centered on screen.
+    """
+
+    menu = [
+        "1. Generate Maze",
+        "2. Change Color of Maze",
+        "X. Exit"
+    ]
+
+    max_y, max_x = window.getmaxyx()
+
+    menu_width = max(len(line) for line in menu)
+
+    start_x = (max_x - menu_width) // 2
+    start_y = 16
+
+    for i, line in enumerate(menu):
+        window.addstr(start_y + i, start_x, line, cs.A_BOLD)
+
+    window.refresh()
 
 
-def draw_a_maze_ing_header(window: cs.window) -> None:
+def draw_a_maze_ing_header(window: cs.window) -> Union[str | None]:
 
     header = """
 ******************************************************************\
@@ -155,31 +176,31 @@ __|     |_____||_____|\\____|`._____.'      *
 ******************************************************************\
 ****************************************** *
 """
-    window.timeout(200)
 
     max_y, max_x = window.getmaxyx()
     lines = header.split('\n')
     header_width = max(len(line) for line in lines)
     start_x = (max_x - header_width) // 2
     start_y = 0
-    show = True
+    key = None
 
+    window.clear()
+    window.nodelay(True)
     while True:
-        window.clear()
-        if show:
-            for i, line in enumerate(lines):
-                if line.strip():
-                    window.addstr(start_y + i, start_x, line, cs.A_BOLD)
+        display_menu(window)
+        for i, line in enumerate(lines):
+            if line.strip():
+                window.addstr(start_y + i, start_x, line, cs.A_BOLD)
         window.refresh()
-        cs.napms(500)
-        if window.getch() != -1:
-            break
-        show = not show
+        try:
+            key = window.getkey()
+            window.nodelay(False)
+            return key
+        except Exception:
+            key = None
 
-    window.timeout(-1)
 
-
-def display_maze(maze_lines: list[str], config: dict) -> None:
+def display_maze(maze_lines: list[str], config: dict) -> str:
     """
     Main function to display the complete maze on terminal.
     Uses curses library to draw header and the maze with walls and markers.
@@ -189,8 +210,7 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
         cs.curs_set(0)
         window.clear()
 
-        draw_a_maze_ing_header(window)
-        display_menu(window)
+        key = draw_a_maze_ing_header(window)
 
         window.clear()
         maze_width = config['WIDTH']
@@ -198,13 +218,26 @@ def display_maze(maze_lines: list[str], config: dict) -> None:
         maze_entry = config['ENTRY']
         maze_exit = config['EXIT']
 
-        draw_the_maze(window, maze_lines, maze_width, maze_height)
-        draw_entry_exit(window, maze_entry, maze_exit)
+        if key == "1" or key in ('\n', 'KEY_ENTER'):
+            window.clear()
+            draw_the_maze(window, maze_lines, maze_width, maze_height)
+            draw_entry_exit(window, maze_entry, maze_exit)
+            window.refresh()
+
+            while True:
+                key = window.getkey()
+
+                if key == "x" or key == "X" or key == '\x1b':
+                    return "regenerate"
+        elif key == "x" or key == "X" or key == '\x1b':
+            return "exit"
 
         window.refresh()
         window.getch()
 
     try:
-        cs.wrapper(draw)
+        result = cs.wrapper(draw)
+        return result
     except Exception as e:
         print("Error While Drawing Maze:", e)
+        return "exit"
