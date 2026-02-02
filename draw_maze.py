@@ -89,15 +89,15 @@ def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
                                    walls['left'], walls['right'])
             screen_y = cy * 3
             screen_x = cx * 3
-            window.addch(screen_y, screen_x, char)
+            window.addch(screen_y, screen_x, char, cs.A_BOLD)
 
             if walls['right'] and cx < width:
-                window.addch(screen_y, screen_x + 1, '━')
-                window.addch(screen_y, screen_x + 2, '━')
+                window.addch(screen_y, screen_x + 1, '━',  cs.A_BOLD)
+                window.addch(screen_y, screen_x + 2, '━',  cs.A_BOLD)
 
             if walls['down'] and cy < height:
-                window.addch(screen_y + 1, screen_x, '┃')
-                window.addch(screen_y + 2, screen_x, '┃')
+                window.addch(screen_y + 1, screen_x, '┃',  cs.A_BOLD)
+                window.addch(screen_y + 2, screen_x, '┃',  cs.A_BOLD)
 
 
 def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
