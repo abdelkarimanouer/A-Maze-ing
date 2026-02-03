@@ -21,24 +21,23 @@ def main():
         maze = generate_maze.Maze(config["WIDTH"], config["HEIGHT"])
 
         result = display_maze(maze, config)
-        if result == "regenerate":
+        if result == "done":
+            with open(config['OUTPUT_FILE'], "w") as maze_file:
+                for _ in maze.maze_struct:
+                    for c in _:
+                        maze_file.write(format(c.wall, 'X'))
+                    maze_file.write("\n")
+
+                maze_file.write("\n")
+                maze_file.write(str(config["ENTRY"]).strip("()"))
+                maze_file.write("\n")
+                maze_file.write(str(config["EXIT"]).strip("()"))
+                maze_file.write("\n")
+                maze_file.write(maze.maze_solver(config["ENTRY"],
+                                                 config["EXIT"]))
             continue
         elif result == "exit":
             break
-
-        open(config['OUTPUT_FILE'], "w").close()
-        with open(config['OUTPUT_FILE'], "a+") as maze_file:
-            for _ in maze.maze_struct:
-                for c in _:
-                    maze_file.write(format(c.wall, 'X'))
-                maze_file.write("\n")
-
-            maze_file.write("\n")
-            maze_file.write(str(config["ENTRY"]).strip("()"))
-            maze_file.write("\n")
-            maze_file.write(str(config["EXIT"]).strip("()"))
-            maze_file.write("\n")
-            maze_file.write(maze.maze_solver(config["ENTRY"], config["EXIT"]))
 
     exit()
 
