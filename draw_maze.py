@@ -256,8 +256,16 @@ def display_maze(maze_lines: list[str], config: dict) -> str:
 
             while True:
                 key = window.getkey()
-
-                if key == "x" or key == "X" or key == '\x1b':
+                if key == '1':
+                    # find path
+                    pass
+                elif key == '2':
+                    # Show/Hide Path
+                    pass
+                elif key == '3':
+                    # Player mode
+                    pass
+                elif key == "x" or key == "X" or key == '\x1b':
                     return "regenerate"
         elif key == "x" or key == "X" or key == '\x1b':
             return "exit"
