@@ -1,5 +1,4 @@
 import curses as cs
-from typing import Union
 
 
 def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
@@ -170,7 +169,7 @@ def draw_maze_menu(window: cs.window, maze_width: int,
             window.addstr(menu_y + i, menu_x, line, cs.A_BOLD)
 
 
-def draw_a_maze_ing_header(window: cs.window) -> Union[str | None]:
+def draw_a_maze_ing_header(window: cs.window) -> str:
 
     header = """
 ******************************************************************\
@@ -229,6 +228,61 @@ __|     |_____||_____|\\____|`._____.'      *
             key = None
 
 
+def draw_congratulations(window: cs.window) -> None:
+
+    header = """
+****************************************************************************************************
+*          ___ ___  _  _  ___ ___    _ _____ _   _ _      _ _____ ___ ___  _  _  ___ 
+*         / __/ _ \| \| |/ __| _ \  /_\_   _| | | | |    /_\_   _|_ _/ _ \| \| |/ __|         *
+*        | (_| (_) | .` | (_ |   / / _ \| | | |_| | |__ / _ \| |  | | (_) | .` |\__ \\        *
+*         \___\___/|_|\_|\___|_|_\/_/ \_\_|  \___/|____/_/ \_\_| |___\___/|_|\_|___/
+*                                                                                                      
+****************************************************************************************************
+"""
+    max_y, max_x = window.getmaxyx()
+    lines = header.split('\n')
+    header_width = max(len(line) for line in lines)
+    start_x = (max_x - header_width) // 2
+    start_y = 0
+
+    window.clear()
+    for i, line in enumerate(lines):
+        if line.strip():
+            window.addstr(start_y + i, start_x, line, cs.A_BOLD)
+    window.refresh()
+
+
+def player_mode(window: cs.window, entry: tuple, exit: tuple,
+                maze_lines: list[str], width: int, height: int) -> bool:
+
+    x, y = entry
+
+    while True:
+        window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+        window.refresh()
+
+        key = window.getkey()
+        if key == "x" or key == "X" or key == '\x1b':
+            return False
+
+        window.addstr((y * 3) + 1, (x * 3) + 1, " ")
+
+        walls = get_cell_walls(y, x, maze_lines)
+
+        if key == "KEY_UP" and not walls['north']:
+            y -= 1
+        elif key == "KEY_DOWN" and not walls['south']:
+            y += 1
+        elif key == "KEY_LEFT" and not walls['west']:
+            x -= 1
+        elif key == "KEY_RIGHT" and not walls['east']:
+            x += 1
+
+        if (x, y) == exit:
+            window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+            return True
+
+
 def display_maze(maze_lines: list[str], config: dict) -> str:
     """
     Main function to display the complete maze on terminal.
@@ -263,8 +317,9 @@ def display_maze(maze_lines: list[str], config: dict) -> str:
                     # Show/Hide Path
                     pass
                 elif key == '3':
-                    # Player mode
-                    pass
+                    if player_mode(window, maze_entry, maze_exit, maze_lines,
+                                   maze_width, maze_height):
+                        draw_congratulations(window)
                 elif key == "x" or key == "X" or key == '\x1b':
                     return "regenerate"
         elif key == "x" or key == "X" or key == '\x1b':
