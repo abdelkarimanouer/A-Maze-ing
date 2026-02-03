@@ -1,5 +1,6 @@
 import curses as cs
 import time
+import generate_maze
 
 
 def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
@@ -27,6 +28,30 @@ def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
         return directions
 
 
+def get_cell_walls_from_struct(row: int, col: int,
+                              maze_struct: list[list]) -> dict:
+    """
+    Same idea as get_cell_walls(), but reads from maze_struct (Cell.wall).
+    """
+    if row < 0 or col < 0:
+        return {'east': False, 'north': False, 'west': False, 'south': False}
+
+    if row >= len(maze_struct):
+        return {'east': False, 'north': False, 'west': False, 'south': False}
+
+    if col >= len(maze_struct[0]):
+        return {'east': False, 'north': False, 'west': False, 'south': False}
+
+    v = maze_struct[row][col].wall
+
+    return {
+        'north': bool(v & 1),
+        'east': bool(v & 2),
+        'south': bool(v & 4),
+        'west': bool(v & 8),
+    }
+
+
 def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
     """
     Checks walls around a corner point where 4 cells meet.
@@ -37,6 +62,24 @@ def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
     top_right = get_cell_walls(cy - 1, cx, maze_lines)
     bottom_left = get_cell_walls(cy, cx - 1, maze_lines)
     bottom_right = get_cell_walls(cy, cx, maze_lines)
+
+    up = top_left['east'] or top_right['west']
+    down = bottom_left['east'] or bottom_right['west']
+    left = top_left['south'] or bottom_left['north']
+    right = top_right['south'] or bottom_right['north']
+
+    return {'up': up, 'down': down, 'left': left, 'right': right}
+
+
+def get_corner_walls_from_struct(cy: int, cx: int,
+                                 maze_struct: list[list]) -> dict:
+    """
+    Same idea as get_corner_walls(), but reads from maze_struct.
+    """
+    top_left = get_cell_walls_from_struct(cy - 1, cx - 1, maze_struct)
+    top_right = get_cell_walls_from_struct(cy - 1, cx, maze_struct)
+    bottom_left = get_cell_walls_from_struct(cy, cx - 1, maze_struct)
+    bottom_right = get_cell_walls_from_struct(cy, cx, maze_struct)
 
     up = top_left['east'] or top_right['west']
     down = bottom_left['east'] or bottom_right['west']
@@ -99,6 +142,34 @@ def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
             if walls['down'] and cy < height:
                 window.addstr(screen_y + 1, screen_x, '┃',  cs.A_BOLD)
                 window.addstr(screen_y + 2, screen_x, '┃',  cs.A_BOLD)
+
+
+def draw_the_maze_from_struct(window: cs.window,
+                             maze_struct: list[list],
+                             width: int, height: int) -> None:
+    """
+    Draw maze using maze_struct (live walls), not maze_lines.
+    """
+    corner_rows = height + 1
+    corner_cols = width + 1
+
+    for cy in range(corner_rows):
+        for cx in range(corner_cols):
+            walls = get_corner_walls_from_struct(cy, cx, maze_struct)
+            char = get_corner_char(walls['up'], walls['down'],
+                                   walls['left'], walls['right'])
+
+            screen_y = cy * 3
+            screen_x = cx * 3
+            window.addstr(screen_y, screen_x, char, cs.A_BOLD)
+
+            if walls['right'] and cx < width:
+                window.addstr(screen_y, screen_x + 1, '━', cs.A_BOLD)
+                window.addstr(screen_y, screen_x + 2, '━', cs.A_BOLD)
+
+            if walls['down'] and cy < height:
+                window.addstr(screen_y + 1, screen_x, '┃', cs.A_BOLD)
+                window.addstr(screen_y + 2, screen_x, '┃', cs.A_BOLD)
 
 
 def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
@@ -290,7 +361,7 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
             return True
 
 
-def display_maze(maze_lines: list[str], config: dict) -> str:
+def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     """
     Main function to display the complete maze on terminal.
     Uses curses library to draw header and the maze with walls and markers.
@@ -303,6 +374,17 @@ def display_maze(maze_lines: list[str], config: dict) -> str:
         nonlocal result
         cs.curs_set(0)
         window.clear()
+
+        def step() -> None:
+            window.clear()
+            draw_the_maze_from_struct(
+                window,
+                maze.maze_struct,
+                config["WIDTH"],
+                config["HEIGHT"]
+            )
+            draw_entry_exit(window, config["ENTRY"], config["EXIT"])
+            window.refresh()
 
         key = draw_a_maze_ing_header(window)
 
