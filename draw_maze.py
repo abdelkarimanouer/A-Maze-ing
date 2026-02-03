@@ -90,15 +90,15 @@ def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
                                    walls['left'], walls['right'])
             screen_y = cy * 3
             screen_x = cx * 3
-            window.addch(screen_y, screen_x, char, cs.A_BOLD)
+            window.addstr(screen_y, screen_x, char, cs.A_BOLD)
 
             if walls['right'] and cx < width:
-                window.addch(screen_y, screen_x + 1, '━',  cs.A_BOLD)
-                window.addch(screen_y, screen_x + 2, '━',  cs.A_BOLD)
+                window.addstr(screen_y, screen_x + 1, '━',  cs.A_BOLD)
+                window.addstr(screen_y, screen_x + 2, '━',  cs.A_BOLD)
 
             if walls['down'] and cy < height:
-                window.addch(screen_y + 1, screen_x, '┃',  cs.A_BOLD)
-                window.addch(screen_y + 2, screen_x, '┃',  cs.A_BOLD)
+                window.addstr(screen_y + 1, screen_x, '┃',  cs.A_BOLD)
+                window.addstr(screen_y + 2, screen_x, '┃',  cs.A_BOLD)
 
 
 def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
@@ -110,12 +110,12 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     entry_x, entry_y = entry
     entry_screen_y = (entry_y * 3) + 1
     entry_screen_x = (entry_x * 3) + 1
-    window.addch(entry_screen_y, entry_screen_x, '🏁')
+    window.addstr(entry_screen_y, entry_screen_x, '🏁')
 
     exit_x, exit_y = exit
     exit_screen_y = (exit_y * 3) + 1
     exit_screen_x = (exit_x * 3) + 1
-    window.addch(exit_screen_y, exit_screen_x, '🚩')
+    window.addstr(exit_screen_y, exit_screen_x, '🚩')
 
 
 def display_menu_with_header(window: cs.window) -> str:
@@ -140,6 +140,34 @@ def display_menu_with_header(window: cs.window) -> str:
         window.addstr(start_y + i, start_x, line, cs.A_BOLD)
 
     window.refresh()
+
+
+def draw_maze_menu(window: cs.window, maze_width: int,
+                   maze_height: int) -> None:
+    """
+    Draws menu on the right side of maze.
+    """
+
+    menu = [
+        "1. Find Path",
+        "2. Show/Hide Path",
+        "3. Player Mode",
+        "X. Exit"
+    ]
+
+    max_y, max_x = window.getmaxyx()
+
+    menu_x = (maze_width + 1) * 3 + 5
+
+    maze_total_height = (maze_height + 1) * 3
+    menu_total_height = len(menu)
+    menu_y = (maze_total_height - menu_total_height) // 2
+
+    for i, line in enumerate(menu):
+        if line.startswith("==="):
+            window.addstr(menu_y + i, menu_x, line, cs.A_BOLD | cs.A_UNDERLINE)
+        elif line:
+            window.addstr(menu_y + i, menu_x, line, cs.A_BOLD)
 
 
 def draw_a_maze_ing_header(window: cs.window) -> Union[str | None]:
@@ -194,8 +222,9 @@ __|     |_____||_____|\\____|`._____.'      *
         window.refresh()
         try:
             key = window.getkey()
-            window.nodelay(False)
-            return key
+            if key == '1' or key == 'x' or key == 'X' or key == '\x1b':
+                window.nodelay(False)
+                return key
         except Exception:
             key = None
 
@@ -222,6 +251,7 @@ def display_maze(maze_lines: list[str], config: dict) -> str:
             window.clear()
             draw_the_maze(window, maze_lines, maze_width, maze_height)
             draw_entry_exit(window, maze_entry, maze_exit)
+            draw_maze_menu(window, maze_width, maze_height)
             window.refresh()
 
             while True:
