@@ -93,7 +93,7 @@ class Maze:
                 ]
                 if step:
                     step()
-                self.maze_generator([next_x, next_y])
+                self.maze_generator([next_x, next_y], step)
 
     def maze_solver(self, entry, exit):
         frontier = deque([entry])
