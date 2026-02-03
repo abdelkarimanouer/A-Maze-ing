@@ -146,7 +146,7 @@ def main():
     while True:
         maze = Maze(config["WIDTH"], config["HEIGHT"])
         maze.maze_generator(config["ENTRY"])
-        maze_lines: list[str] = []
+        maze_lines = []
 
         open(config['OUTPUT_FILE'], "w").close()
         with open(config['OUTPUT_FILE'], "a+") as maze_file:
