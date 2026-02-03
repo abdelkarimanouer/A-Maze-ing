@@ -118,7 +118,7 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     window.addstr(exit_screen_y, exit_screen_x, '🚩')
 
 
-def display_menu_with_header(window: cs.window) -> str:
+def display_menu_with_header(window: cs.window) -> None:
     """
     Shows menu options centered on screen.
     """
@@ -296,7 +296,11 @@ def display_maze(maze_lines: list[str], config: dict) -> str:
     Uses curses library to draw header and the maze with walls and markers.
     Waits for key press before closing.
     """
+
+    result = "exit"
+
     def draw(window: cs.window) -> None:
+        nonlocal result
         cs.curs_set(0)
         window.clear()
 
@@ -328,17 +332,19 @@ def display_maze(maze_lines: list[str], config: dict) -> str:
                                    maze_width, maze_height):
                         draw_congratulations(window)
                         time.sleep(3)
-                        return "regenerate"
+                        result = "regenerate"
+                        break
                 elif key == "x" or key == "X" or key == '\x1b':
-                    return "regenerate"
+                    result = "regenerate"
+                    break
         elif key == "x" or key == "X" or key == '\x1b':
-            return "exit"
+            result = "exit"
 
         window.refresh()
         window.getch()
 
     try:
-        result = cs.wrapper(draw)
+        cs.wrapper(draw)
         return result
     except Exception as e:
         print("Error While Drawing Maze:", e)
