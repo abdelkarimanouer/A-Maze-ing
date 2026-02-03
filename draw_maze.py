@@ -3,33 +3,8 @@ import time
 import generate_maze
 
 
-def get_cell_walls(row: int, col: int, maze_lines: list[str]) -> dict:
-    """
-    Checks which walls exist for a cell at given position.
-    Returns dictionary with 4 directions (north, east, south, west).
-    Each direction is True if wall exists, False if not.
-    """
-    directions = dict()
-    if row < 0 or col < 0:
-        return {'east': False, 'north': False, 'west': False, 'south': False}
-    if row >= len(maze_lines):
-        return {'east': False, 'north': False, 'west': False, 'south': False}
-    line = maze_lines[row].strip()
-    if col >= len(line):
-        return {'east': False, 'north': False, 'west': False, 'south': False}
-    else:
-        line = maze_lines[row].strip()
-        char_h = line[col]
-        v = int(char_h, 16)
-        directions['north'] = bool(v & 1)
-        directions['east'] = bool(v & 2)
-        directions['south'] = bool(v & 4)
-        directions['west'] = bool(v & 8)
-        return directions
-
-
 def get_cell_walls_from_struct(row: int, col: int,
-                              maze_struct: list[list]) -> dict:
+                               maze_struct: list[list]) -> dict:
     """
     Same idea as get_cell_walls(), but reads from maze_struct (Cell.wall).
     """
@@ -50,25 +25,6 @@ def get_cell_walls_from_struct(row: int, col: int,
         'south': bool(v & 4),
         'west': bool(v & 8),
     }
-
-
-def get_corner_walls(cy: int, cx: int, maze_lines: list[str]) -> dict:
-    """
-    Checks walls around a corner point where 4 cells meet.
-    Looks at all 4 cells around the corner.
-    Returns which walls connect to this corner point.
-    """
-    top_left = get_cell_walls(cy - 1, cx - 1, maze_lines)
-    top_right = get_cell_walls(cy - 1, cx, maze_lines)
-    bottom_left = get_cell_walls(cy, cx - 1, maze_lines)
-    bottom_right = get_cell_walls(cy, cx, maze_lines)
-
-    up = top_left['east'] or top_right['west']
-    down = bottom_left['east'] or bottom_right['west']
-    left = top_left['south'] or bottom_left['north']
-    right = top_right['south'] or bottom_right['north']
-
-    return {'up': up, 'down': down, 'left': left, 'right': right}
 
 
 def get_corner_walls_from_struct(cy: int, cx: int,
@@ -116,37 +72,8 @@ def get_corner_char(up: bool, down: bool, left: bool, right: bool) -> str:
     return char_map.get((up, down, left, right), ' ')
 
 
-def draw_the_maze(window: cs.window, maze_lines: list[str], width: int,
-                  height: int) -> None:
-    """
-    Draws the maze walls on the screen using box characters.
-    Each cell takes 3x3 spaces on screen for better visibility.
-    Connects all corners and walls to make complete maze.
-    """
-    corner_rows = height + 1
-    corner_cols = width + 1
-
-    for cy in range(corner_rows):
-        for cx in range(corner_cols):
-            walls = get_corner_walls(cy, cx, maze_lines)
-            char = get_corner_char(walls['up'], walls['down'],
-                                   walls['left'], walls['right'])
-            screen_y = cy * 3
-            screen_x = cx * 3
-            window.addstr(screen_y, screen_x, char, cs.A_BOLD)
-
-            if walls['right'] and cx < width:
-                window.addstr(screen_y, screen_x + 1, '━',  cs.A_BOLD)
-                window.addstr(screen_y, screen_x + 2, '━',  cs.A_BOLD)
-
-            if walls['down'] and cy < height:
-                window.addstr(screen_y + 1, screen_x, '┃',  cs.A_BOLD)
-                window.addstr(screen_y + 2, screen_x, '┃',  cs.A_BOLD)
-
-
-def draw_the_maze_from_struct(window: cs.window,
-                             maze_struct: list[list],
-                             width: int, height: int) -> None:
+def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
+                              width: int, height: int) -> None:
     """
     Draw maze using maze_struct (live walls), not maze_lines.
     """
@@ -283,7 +210,7 @@ __|     |_____||_____|\\____|`._____.'      *
     start_y = 0
     key = None
 
-    window.clear()
+    window.erase()
     window.nodelay(True)
     while True:
         display_menu_with_header(window)
@@ -323,42 +250,42 @@ def draw_congratulations(window: cs.window) -> None:
     start_x = (max_x - header_width) // 2
     start_y = (max_y - header_height) // 2
 
-    window.clear()
+    window.erase()
     for i, line in enumerate(lines):
         if line.strip():
             window.addstr(start_y + i, start_x, line, cs.A_BOLD)
     window.refresh()
 
 
-def player_mode(window: cs.window, entry: tuple, exit: tuple,
-                maze_lines: list[str], width: int, height: int) -> bool:
+# def player_mode(window: cs.window, entry: tuple, exit: tuple,
+#                 maze_lines: list[str], width: int, height: int) -> bool:
 
-    x, y = entry
+#     x, y = entry
 
-    while True:
-        window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
-        window.refresh()
+#     while True:
+#         window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+#         window.refresh()
 
-        key = window.getkey()
-        if key == "x" or key == "X" or key == '\x1b':
-            return False
+#         key = window.getkey()
+#         if key == "x" or key == "X" or key == '\x1b':
+#             return False
 
-        window.addstr((y * 3) + 1, (x * 3) + 1, " ")
+#         window.addstr((y * 3) + 1, (x * 3) + 1, " ")
 
-        walls = get_cell_walls(y, x, maze_lines)
+#         walls = get_cell_walls(y, x, maze_lines)
 
-        if key == "KEY_UP" and not walls['north']:
-            y -= 1
-        elif key == "KEY_DOWN" and not walls['south']:
-            y += 1
-        elif key == "KEY_LEFT" and not walls['west']:
-            x -= 1
-        elif key == "KEY_RIGHT" and not walls['east']:
-            x += 1
+#         if key == "KEY_UP" and not walls['north']:
+#             y -= 1
+#         elif key == "KEY_DOWN" and not walls['south']:
+#             y += 1
+#         elif key == "KEY_LEFT" and not walls['west']:
+#             x -= 1
+#         elif key == "KEY_RIGHT" and not walls['east']:
+#             x += 1
 
-        if (x, y) == exit:
-            window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
-            return True
+#         if (x, y) == exit:
+#             window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+#             return True
 
 
 def display_maze(maze: generate_maze.Maze, config: dict) -> str:
@@ -373,10 +300,10 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     def draw(window: cs.window) -> None:
         nonlocal result
         cs.curs_set(0)
-        window.clear()
+        window.erase()
 
         def step() -> None:
-            window.clear()
+            window.erase()
             draw_the_maze_from_struct(
                 window,
                 maze.maze_struct,
@@ -384,19 +311,23 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
                 config["HEIGHT"]
             )
             draw_entry_exit(window, config["ENTRY"], config["EXIT"])
-            window.refresh()
+            window.noutrefresh()
+            cs.doupdate()
+            time.sleep(0.02)
 
         key = draw_a_maze_ing_header(window)
 
-        window.clear()
+        window.erase()
         maze_width = config['WIDTH']
         maze_height = config['HEIGHT']
         maze_entry = config['ENTRY']
         maze_exit = config['EXIT']
 
         if key == "1" or key in ('\n', 'KEY_ENTER'):
-            window.clear()
-            draw_the_maze(window, maze_lines, maze_width, maze_height)
+            window.erase()
+            maze.maze_generator(maze_entry, step)
+            draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
+                                      maze_height)
             draw_entry_exit(window, maze_entry, maze_exit)
             draw_maze_menu(window, maze_width, maze_height)
             window.refresh()
@@ -409,15 +340,15 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
                 elif key == '2':
                     # Show/Hide Path
                     pass
-                elif key == '3':
-                    if player_mode(window, maze_entry, maze_exit, maze_lines,
-                                   maze_width, maze_height):
-                        draw_congratulations(window)
-                        time.sleep(3)
-                        result = "regenerate"
-                        break
+                # elif key == '3':
+                #     if player_mode(window, maze_entry, maze_exit, maze_lines,
+                #                    maze_width, maze_height):
+                #         draw_congratulations(window)
+                #         time.sleep(3)
+                #         result = "regenerate"
+                #         break
                 elif key == "x" or key == "X" or key == '\x1b':
-                    result = "regenerate"
+                    result = "done"
                     break
         elif key == "x" or key == "X" or key == '\x1b':
             result = "exit"
