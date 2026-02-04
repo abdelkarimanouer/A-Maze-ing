@@ -257,35 +257,35 @@ def draw_congratulations(window: cs.window) -> None:
     window.refresh()
 
 
-# def player_mode(window: cs.window, entry: tuple, exit: tuple,
-#                 maze_lines: list[str], width: int, height: int) -> bool:
+def player_mode(window: cs.window, entry: tuple, exit: tuple,
+                maze_struct: list[list], width: int, height: int) -> bool:
 
-#     x, y = entry
+    x, y = entry
 
-#     while True:
-#         window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
-#         window.refresh()
+    while True:
+        window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+        window.refresh()
 
-#         key = window.getkey()
-#         if key == "x" or key == "X" or key == '\x1b':
-#             return False
+        key = window.getkey()
+        if key == "x" or key == "X" or key == '\x1b':
+            return False
 
-#         window.addstr((y * 3) + 1, (x * 3) + 1, " ")
+        window.addstr((y * 3) + 1, (x * 3) + 1, " ")
 
-#         walls = get_cell_walls(y, x, maze_lines)
+        walls = get_cell_walls_from_struct(y, x, maze_struct)
 
-#         if key == "KEY_UP" and not walls['north']:
-#             y -= 1
-#         elif key == "KEY_DOWN" and not walls['south']:
-#             y += 1
-#         elif key == "KEY_LEFT" and not walls['west']:
-#             x -= 1
-#         elif key == "KEY_RIGHT" and not walls['east']:
-#             x += 1
+        if key == "KEY_UP" and not walls['north']:
+            y -= 1
+        elif key == "KEY_DOWN" and not walls['south']:
+            y += 1
+        elif key == "KEY_LEFT" and not walls['west']:
+            x -= 1
+        elif key == "KEY_RIGHT" and not walls['east']:
+            x += 1
 
-#         if (x, y) == exit:
-#             window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
-#             return True
+        if (x, y) == exit:
+            window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+            return True
 
 
 def display_maze(maze: generate_maze.Maze, config: dict) -> str:
@@ -341,13 +341,13 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
                 elif key == '2':
                     # Show/Hide Path
                     pass
-                # elif key == '3':
-                #     if player_mode(window, maze_entry, maze_exit, maze_lines,
-                #                    maze_width, maze_height):
-                #         draw_congratulations(window)
-                #         time.sleep(3)
-                #         result = "regenerate"
-                #         break
+                elif key == '3':
+                    if player_mode(window, maze_entry, maze_exit,
+                                   maze.maze_struct, maze_width, maze_height):
+                        draw_congratulations(window)
+                        time.sleep(3)
+                        result = "regenerate"
+                        break
                 elif key == "x" or key == "X" or key == '\x1b':
                     result = "done"
                     break
