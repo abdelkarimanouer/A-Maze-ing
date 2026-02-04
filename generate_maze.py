@@ -93,7 +93,7 @@ class Maze:
                     ]
                     if step:
                         step()
-                    self.maze_generator([next_x, next_y], step)
+                    self.maze_generator([next_x, next_y], step, perfect)
             elif perfect is False:
                 neighbor = self.maze_struct[next_y][next_x]
 
@@ -102,7 +102,7 @@ class Maze:
                     neighbor.wall ^= bin_value[rev_directions[direction]]
                     if step:
                         step()
-                    self.maze_generator([next_x, next_y], step)
+                    self.maze_generator([next_x, next_y], step, perfect)
 
                 else:
                     loop_chance = 0.10
