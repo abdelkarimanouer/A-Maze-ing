@@ -43,7 +43,14 @@ def config_parsing(config: dict) -> dict:
         config["ENTRY"] = tuple(map(int, config["ENTRY"].split(",")))
         config["EXIT"] = tuple(map(int, config["EXIT"].split(",")))
 
-        config["PERFECT"] = config["PERFECT"].upper() == "TRUE"
+        value = config["PERFECT"].upper()
+        if value == "TRUE":
+            config["PERFECT"] = True
+        elif value == "FALSE":
+            config["PERFECT"] = False
+        else:
+            print("ERROR: PERFECT must be TRUE or FALSE")
+            sys.exit(1)
 
     except ValueError as error:
         print(f"ERROR: {error}")

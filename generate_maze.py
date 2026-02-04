@@ -62,7 +62,7 @@ class Maze:
             self.maze_struct[s_y + 1][s_x - 1].visited = True
             self.maze_struct[s_y + 2][s_x - 1].visited = True
 
-    def maze_generator(self, entry, step=None):
+    def maze_generator(self, entry, step=None, perfect=True):
         """
         Generates the maze using recursive backtracking.
         Starts from entry point and carves paths randomly.
@@ -83,17 +83,34 @@ class Maze:
             ):
                 continue
 
-            if self.maze_struct[next_y][next_x].visited is False:
+            if perfect:
+                if self.maze_struct[next_y][next_x].visited is False:
+                    neighbor = self.maze_struct[next_y][next_x]
 
+                    curent.wall = curent.wall ^ bin_value[direction]
+                    neighbor.wall = neighbor.wall ^ bin_value[
+                        rev_directions[direction]
+                    ]
+                    if step:
+                        step()
+                    self.maze_generator([next_x, next_y], step)
+            elif perfect is False:
                 neighbor = self.maze_struct[next_y][next_x]
 
-                curent.wall = curent.wall ^ bin_value[direction]
-                neighbor.wall = neighbor.wall ^ bin_value[
-                    rev_directions[direction]
-                ]
-                if step:
-                    step()
-                self.maze_generator([next_x, next_y], step)
+                if neighbor.visited is False:
+                    curent.wall ^= bin_value[direction]
+                    neighbor.wall ^= bin_value[rev_directions[direction]]
+                    if step:
+                        step()
+                    self.maze_generator([next_x, next_y], step)
+
+                else:
+                    loop_chance = 0.10
+                    if (curent.wall & bin_value[direction]) and (random.random() < loop_chance):
+                        curent.wall ^= bin_value[direction]
+                        neighbor.wall ^= bin_value[rev_directions[direction]]
+                        if step:
+                            step()
 
     def maze_solver(self, entry, exit):
         frontier = deque([entry])

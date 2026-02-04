@@ -322,10 +322,11 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         maze_height = config['HEIGHT']
         maze_entry = config['ENTRY']
         maze_exit = config['EXIT']
+        perfect = config['PERFECT']
 
         if key == "1" or key in ('\n', 'KEY_ENTER'):
             window.erase()
-            maze.maze_generator(maze_entry, step)
+            maze.maze_generator(maze_entry, step, perfect)
             draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
                                       maze_height)
             draw_entry_exit(window, maze_entry, maze_exit)
