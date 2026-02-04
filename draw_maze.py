@@ -72,11 +72,29 @@ def get_corner_char(up: bool, down: bool, left: bool, right: bool) -> str:
     return char_map.get((up, down, left, right), ' ')
 
 
+def fill_cells(window: cs.window, maze_struct: list[list],
+               width: int, height: int, *, use_visited: bool) -> None:
+    for y in range(height):
+        for x in range(width):
+            if use_visited and maze_struct[y][x].visited:
+                attr = cs.color_pair(3)
+            else:
+                attr = cs.color_pair(2)
+
+            sy = y * 3 + 1
+            sx = x * 3 + 1
+
+            window.addstr(sy,     sx,     "  ", attr)
+            window.addstr(sy + 1, sx,     "  ", attr)
+
+
 def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
-                              width: int, height: int) -> None:
+                              width: int, height: int,
+                              use_visited=True) -> None:
     """
     Draw maze using maze_struct (live walls), not maze_lines.
     """
+    fill_cells(window, maze_struct, width, height, use_visited=use_visited)
     corner_rows = height + 1
     corner_cols = width + 1
 
@@ -263,14 +281,11 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
     x, y = entry
 
     while True:
-        window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
-        window.refresh()
-
         key = window.getkey()
         if key == "x" or key == "X" or key == '\x1b':
             return False
 
-        window.addstr((y * 3) + 1, (x * 3) + 1, " ")
+        window.addstr((y * 3) + 1, (x * 3) + 1, "  ", cs.color_pair(3))
 
         walls = get_cell_walls_from_struct(y, x, maze_struct)
 
@@ -283,8 +298,11 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
         elif key == "KEY_RIGHT" and not walls['east']:
             x += 1
 
+        window.addstr((y * 3) + 1, (x * 3) + 1, "👤", cs.color_pair(3))
+        window.refresh()
+
         if (x, y) == exit:
-            window.addstr((y * 3) + 1, (x * 3) + 1, "👤")
+            time.sleep(0.1)
             return True
 
 
@@ -300,6 +318,22 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     def draw(window: cs.window) -> None:
         nonlocal result
         cs.curs_set(0)
+        cs.start_color()
+        cs.use_default_colors()
+
+        # walls white on black
+        cs.init_pair(1, cs.COLOR_WHITE, cs.COLOR_BLACK)
+
+        # for cells white background
+        cs.init_pair(2, cs.COLOR_BLACK, cs.COLOR_WHITE)
+
+        # for cells black background
+        cs.init_pair(3, cs.COLOR_BLACK, cs.COLOR_BLACK)
+
+        # Foreground default, background black
+        cs.init_pair(10, -1, cs.COLOR_BLACK)
+        window.bkgd(' ', cs.color_pair(10))
+
         window.erase()
 
         def step() -> None:
@@ -313,7 +347,7 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
             draw_entry_exit(window, config["ENTRY"], config["EXIT"])
             window.noutrefresh()
             cs.doupdate()
-            time.sleep(0.02)
+            time.sleep(0.01)
 
         key = draw_a_maze_ing_header(window)
 
@@ -326,6 +360,9 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
 
         if key == "1" or key in ('\n', 'KEY_ENTER'):
             window.erase()
+            draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
+                                      maze_height, use_visited=False)
+            window.refresh()
             maze.maze_generator(maze_entry, step, perfect)
             draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
                                       maze_height)
