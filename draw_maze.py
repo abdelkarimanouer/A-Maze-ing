@@ -353,9 +353,6 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         elif key == "x" or key == "X" or key == '\x1b':
             result = "exit"
 
-        window.refresh()
-        window.getch()
-
     try:
         cs.wrapper(draw)
         return result
