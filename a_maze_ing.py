@@ -38,7 +38,6 @@ def main():
             continue
         elif result == "exit":
             break
-
     exit()
 
 
