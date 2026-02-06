@@ -311,9 +311,9 @@ def animate_path(window, entry, path):
     delay = 0.08
 
     for move in path:
-        ox, oy = x, y  # old cell
+        old_x, old_y = x, y  # save old cell
 
-        # move
+        # move path
         if move == "N":
             y -= 1
         elif move == "S":
@@ -325,13 +325,13 @@ def animate_path(window, entry, path):
 
         # paint corridor between old and new (THE GAP)
         if move in ("E", "W"):
-            gx = min(ox, x) * 3 + 3
-            gy = oy * 3 + 1
+            gx = min(old_x, x) * 3 + 3
+            gy = old_y * 3 + 1
             window.addstr(gy,     gx, " ", cs.color_pair(3))
             window.addstr(gy + 1, gx, " ", cs.color_pair(3))
         else:  # N or S
-            gy = min(oy, y) * 3 + 3
-            gx = ox * 3 + 1
+            gy = min(old_y, y) * 3 + 3
+            gx = old_x * 3 + 1
             window.addstr(gy, gx, "  ", cs.color_pair(3))
 
         # paint new cell (FULL interior 2x2)
