@@ -350,6 +350,45 @@ def animate_path(window, entry, path, delay=0.08):
         time.sleep(delay)
 
 
+def set_colors() -> None:
+
+    cs.start_color()
+    cs.use_default_colors()
+
+    # for cells white background
+    cs.init_pair(1, cs.COLOR_BLACK, cs.COLOR_WHITE)
+
+    # for cells black background
+    cs.init_pair(2, cs.COLOR_BLACK, cs.COLOR_BLACK)
+
+    # Green Color For Path
+    cs.init_pair(3, cs.COLOR_BLACK, cs.COLOR_GREEN)
+
+    # Blue color
+    cs.init_pair(4, cs.COLOR_BLUE, cs.COLOR_BLACK)
+    # white color
+    cs.init_pair(5, cs.COLOR_WHITE, cs.COLOR_BLACK)
+
+    # Foreground default, background black
+    cs.init_pair(10, -1, cs.COLOR_BLACK)
+
+
+def first_generate_maze(window: cs.window, maze: generate_maze.Maze,
+                        maze_entry: tuple, maze_width: int,
+                        maze_height: int, color_walls: int,
+                        perfect: bool,
+                        maze_exit: tuple, step=None) -> None:
+    window.erase()
+    maze.maze_generator(maze_entry, step, perfect)
+    draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
+                              maze_height, color_walls)
+    draw_entry_exit(window, maze_entry, maze_exit)
+    draw_maze_menu(window, maze_width, maze_height)
+    window.refresh()
+
+    cs.flushinp()
+
+
 def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     """
     Main function to display the complete maze on terminal.
@@ -366,23 +405,8 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         cs.curs_set(0)
         cs.noecho()
         window.keypad(True)
-        cs.start_color()
-        cs.use_default_colors()
 
-        # for cells white background
-        cs.init_pair(1, cs.COLOR_BLACK, cs.COLOR_WHITE)
-
-        # for cells black background
-        cs.init_pair(2, cs.COLOR_BLACK, cs.COLOR_BLACK)
-
-        # Green Color For Path
-        cs.init_pair(3, cs.COLOR_BLACK, cs.COLOR_GREEN)
-
-        cs.init_pair(4, cs.COLOR_BLUE, cs.COLOR_BLACK)
-        cs.init_pair(5, cs.COLOR_WHITE, cs.COLOR_BLACK)
-
-        # Foreground default, background black
-        cs.init_pair(10, -1, cs.COLOR_BLACK)
+        set_colors()
         window.bkgd(' ', cs.color_pair(10))
 
         window.erase()
@@ -411,16 +435,11 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         visible_path = False
         path = None
         color_walls = 5  # this number for white to draw walls
-        if key == "1" or key in ('\n', 'KEY_ENTER'):
-            window.erase()
-            maze.maze_generator(maze_entry, step, perfect)
-            draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
-                                      maze_height, color_walls)
-            draw_entry_exit(window, maze_entry, maze_exit)
-            draw_maze_menu(window, maze_width, maze_height)
-            window.refresh()
 
-            cs.flushinp()
+        if key == "1" or key in ('\n', 'KEY_ENTER'):
+            first_generate_maze(window, maze, maze_entry, maze_width,
+                                maze_height, color_walls, perfect, maze_exit,
+                                step)
             while True:
                 key = window.getkey()
                 if key in ('R', 'r'):
