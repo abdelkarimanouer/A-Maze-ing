@@ -170,6 +170,7 @@ def draw_maze_menu(window: cs.window, maze_width: int,
     """
 
     menu = [
+        "R. ReGenerate The Maze",
         "1. Find Path",
         "2. Show/Hide Path",
         "3. Player Mode",
@@ -360,6 +361,7 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
 
     def draw(window: cs.window) -> None:
         nonlocal result
+        nonlocal maze
         cs.curs_set(0)
         cs.noecho()
         window.keypad(True)
@@ -420,6 +422,26 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
             cs.flushinp()
             while True:
                 key = window.getkey()
+                if key in ('R', 'r'):
+                    n_maze = generate_maze.Maze(maze_width, maze_height)
+
+                    maze = n_maze
+                    visible_path = False
+                    path = None
+                    color_walls = 5
+
+                    window.erase()
+                    maze.maze_generator(maze_entry, step, perfect)
+
+                    window.erase()
+                    draw_the_maze_from_struct(window, maze.maze_struct,
+                                              maze_width, maze_height,
+                                              color_walls)
+                    draw_entry_exit(window, maze_entry, maze_exit)
+                    draw_maze_menu(window, maze_width, maze_height)
+                    window.refresh()
+                    cs.flushinp()
+
                 if key == '1':
                     if path is None:
                         path = maze.maze_solver(maze_entry, maze_exit)
