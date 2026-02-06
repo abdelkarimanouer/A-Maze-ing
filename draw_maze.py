@@ -362,6 +362,7 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     def draw(window: cs.window) -> None:
         nonlocal result
         nonlocal maze
+
         cs.curs_set(0)
         cs.noecho()
         window.keypad(True)
