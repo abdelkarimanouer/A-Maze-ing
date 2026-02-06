@@ -77,9 +77,9 @@ def fill_cells(window: cs.window, maze_struct: list[list],
     for y in range(height):
         for x in range(width):
             if use_visited and maze_struct[y][x].visited:
-                attr = cs.color_pair(3)
-            else:
                 attr = cs.color_pair(2)
+            else:
+                attr = cs.color_pair(1)
 
             sy = y * 3 + 1
             sx = x * 3 + 1
@@ -285,7 +285,7 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
         if key == "x" or key == "X" or key == '\x1b':
             return False
 
-        window.addstr((y * 3) + 1, (x * 3) + 1, "  ", cs.color_pair(3))
+        window.addstr((y * 3) + 1, (x * 3) + 1, "  ", cs.color_pair(2))
 
         walls = get_cell_walls_from_struct(y, x, maze_struct)
 
@@ -298,12 +298,50 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
         elif key == "KEY_RIGHT" and not walls['east']:
             x += 1
 
-        window.addstr((y * 3) + 1, (x * 3) + 1, "👤", cs.color_pair(3))
+        window.addstr((y * 3) + 1, (x * 3) + 1, "👤", cs.color_pair(2))
         window.refresh()
 
         if (x, y) == exit:
             time.sleep(0.1)
             return True
+
+
+def animate_path(window, entry, path):
+    x, y = entry
+    delay = 0.08
+
+    for move in path:
+        ox, oy = x, y  # old cell
+
+        # move
+        if move == "N":
+            y -= 1
+        elif move == "S":
+            y += 1
+        elif move == "E":
+            x += 1
+        elif move == "W":
+            x -= 1
+
+        # paint corridor between old and new (THE GAP)
+        if move in ("E", "W"):
+            gx = min(ox, x) * 3 + 3
+            gy = oy * 3 + 1
+            window.addstr(gy,     gx, " ", cs.color_pair(3))
+            window.addstr(gy + 1, gx, " ", cs.color_pair(3))
+        else:  # N or S
+            gy = min(oy, y) * 3 + 3
+            gx = ox * 3 + 1
+            window.addstr(gy, gx, "  ", cs.color_pair(3))
+
+        # paint new cell (FULL interior 2x2)
+        sy = y * 3 + 1
+        sx = x * 3 + 1
+        window.addstr(sy,     sx, "  ", cs.color_pair(3))
+        window.addstr(sy + 1, sx, "  ", cs.color_pair(3))
+
+        window.refresh()
+        time.sleep(delay)
 
 
 def display_maze(maze: generate_maze.Maze, config: dict) -> str:
@@ -321,14 +359,14 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         cs.start_color()
         cs.use_default_colors()
 
-        # walls white on black
-        cs.init_pair(1, cs.COLOR_WHITE, cs.COLOR_BLACK)
-
         # for cells white background
-        cs.init_pair(2, cs.COLOR_BLACK, cs.COLOR_WHITE)
+        cs.init_pair(1, cs.COLOR_BLACK, cs.COLOR_WHITE)
 
         # for cells black background
-        cs.init_pair(3, cs.COLOR_BLACK, cs.COLOR_BLACK)
+        cs.init_pair(2, cs.COLOR_BLACK, cs.COLOR_BLACK)
+
+        # Green Color For Path
+        cs.init_pair(3, cs.COLOR_BLACK, cs.COLOR_GREEN)
 
         # Foreground default, background black
         cs.init_pair(10, -1, cs.COLOR_BLACK)
@@ -373,8 +411,8 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
             while True:
                 key = window.getkey()
                 if key == '1':
-                    # find path
-                    pass
+                    path = maze.maze_solver(maze_entry, maze_exit)
+                    animate_path(window, maze_entry, path)
                 elif key == '2':
                     # Show/Hide Path
                     pass
