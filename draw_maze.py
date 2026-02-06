@@ -90,7 +90,8 @@ def fill_cells(window: cs.window, maze_struct: list[list],
 
 def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
                               width: int, height: int,
-                              use_visited=True) -> None:
+                              color_walls: int = 5,
+                              use_visited: bool = True) -> None:
     """
     Draw maze using maze_struct (live walls), not maze_lines.
     """
@@ -106,15 +107,20 @@ def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
 
             screen_y = cy * 3
             screen_x = cx * 3
-            window.addstr(screen_y, screen_x, char, cs.A_BOLD)
+            window.addstr(screen_y, screen_x, char,
+                          cs.color_pair(color_walls) | cs.A_BOLD)
 
             if walls['right'] and cx < width:
-                window.addstr(screen_y, screen_x + 1, '━', cs.A_BOLD)
-                window.addstr(screen_y, screen_x + 2, '━', cs.A_BOLD)
+                window.addstr(screen_y, screen_x + 1, '━',
+                              cs.color_pair(color_walls) | cs.A_BOLD)
+                window.addstr(screen_y, screen_x + 2, '━',
+                              cs.color_pair(color_walls) | cs.A_BOLD)
 
             if walls['down'] and cy < height:
-                window.addstr(screen_y + 1, screen_x, '┃', cs.A_BOLD)
-                window.addstr(screen_y + 2, screen_x, '┃', cs.A_BOLD)
+                window.addstr(screen_y + 1, screen_x, '┃',
+                              cs.color_pair(color_walls) | cs.A_BOLD)
+                window.addstr(screen_y + 2, screen_x, '┃',
+                              cs.color_pair(color_walls) | cs.A_BOLD)
 
 
 def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
@@ -141,7 +147,6 @@ def display_menu_with_header(window: cs.window) -> None:
 
     menu = [
         "1. Generate Maze",
-        "2. Change Color of Maze",
         "X. Exit"
     ]
 
@@ -168,6 +173,7 @@ def draw_maze_menu(window: cs.window, maze_width: int,
         "1. Find Path",
         "2. Show/Hide Path",
         "3. Player Mode",
+        "4. Change Color of Maze",
         "X. Exit"
     ]
 
@@ -306,9 +312,8 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
             return True
 
 
-def animate_path(window, entry, path):
+def animate_path(window, entry, path, delay=0.08):
     x, y = entry
-    delay = 0.08
 
     for move in path:
         old_x, old_y = x, y  # save old cell
@@ -356,6 +361,8 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     def draw(window: cs.window) -> None:
         nonlocal result
         cs.curs_set(0)
+        cs.noecho()
+        window.keypad(True)
         cs.start_color()
         cs.use_default_colors()
 
@@ -367,6 +374,9 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
 
         # Green Color For Path
         cs.init_pair(3, cs.COLOR_BLACK, cs.COLOR_GREEN)
+
+        cs.init_pair(4, cs.COLOR_BLUE, cs.COLOR_BLACK)
+        cs.init_pair(5, cs.COLOR_WHITE, cs.COLOR_BLACK)
 
         # Foreground default, background black
         cs.init_pair(10, -1, cs.COLOR_BLACK)
@@ -380,7 +390,7 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
                 window,
                 maze.maze_struct,
                 config["WIDTH"],
-                config["HEIGHT"]
+                config["HEIGHT"],
             )
             draw_entry_exit(window, config["ENTRY"], config["EXIT"])
             window.noutrefresh()
@@ -395,34 +405,68 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         maze_entry = config['ENTRY']
         maze_exit = config['EXIT']
         perfect = config['PERFECT']
-
+        visible_path = False
+        path = None
+        color_walls = 5  # this number for white to draw walls
         if key == "1" or key in ('\n', 'KEY_ENTER'):
             window.erase()
-            draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
-                                      maze_height, use_visited=False)
-            window.refresh()
             maze.maze_generator(maze_entry, step, perfect)
             draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
-                                      maze_height)
+                                      maze_height, color_walls)
             draw_entry_exit(window, maze_entry, maze_exit)
             draw_maze_menu(window, maze_width, maze_height)
             window.refresh()
 
+            cs.flushinp()
             while True:
                 key = window.getkey()
                 if key == '1':
-                    path = maze.maze_solver(maze_entry, maze_exit)
+                    if path is None:
+                        path = maze.maze_solver(maze_entry, maze_exit)
                     animate_path(window, maze_entry, path)
+                    cs.flushinp()
+                    visible_path = True
                 elif key == '2':
-                    # Show/Hide Path
-                    pass
+                    if path is None:
+                        continue
+                    if visible_path is False:
+                        animate_path(window, maze_entry, path, 0)
+                        cs.flushinp()
+                        draw_entry_exit(window, maze_entry, maze_exit)
+                        visible_path = True
+                    else:
+                        window.erase()
+                        draw_the_maze_from_struct(window, maze.maze_struct,
+                                                  maze_width, maze_height,
+                                                  color_walls)
+                        draw_entry_exit(window, maze_entry, maze_exit)
+                        draw_maze_menu(window, maze_width, maze_height)
+                        window.refresh()
+                        visible_path = False
                 elif key == '3':
                     if player_mode(window, maze_entry, maze_exit,
                                    maze.maze_struct, maze_width, maze_height):
                         draw_congratulations(window)
                         time.sleep(3)
-                        result = "regenerate"
                         break
+                elif key == "4":
+                    if color_walls == 5:
+                        color_walls = 4
+                    elif color_walls == 4:
+                        color_walls = 5
+                    window.erase()
+                    maze.maze_generator(maze_entry, step, perfect)
+                    draw_the_maze_from_struct(window, maze.maze_struct,
+                                              maze_width, maze_height,
+                                              color_walls)
+                    draw_entry_exit(window, maze_entry, maze_exit)
+                    draw_maze_menu(window, maze_width, maze_height)
+                    animate_path(window, maze_entry, path, 0)
+                    draw_entry_exit(window, maze_entry, maze_exit)
+                    visible_path = True
+
+                    window.refresh()
+                    cs.flushinp()
                 elif key == "x" or key == "X" or key == '\x1b':
                     result = "done"
                     break
