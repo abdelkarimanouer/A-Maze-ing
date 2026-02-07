@@ -415,8 +415,8 @@ def handle_maze_menu(window: cs.window, maze: generate_maze.Maze,
 
             window.erase()
             draw_the_maze_from_struct(window, maze.maze_struct,
-                                        maze_width, maze_height,
-                                        color_walls)
+                                      maze_width, maze_height,
+                                      color_walls)
             draw_entry_exit(window, maze_entry, maze_exit)
             draw_maze_menu(window, maze_width, maze_height)
             window.refresh()
