@@ -140,13 +140,14 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     window.addstr(exit_screen_y, exit_screen_x, '🚩')
 
 
-def display_menu_with_header(window: cs.window) -> None:
+def display_menu_with_header(window: cs.window, perfect: bool) -> None:
     """
     Shows menu options centered on screen.
     """
 
     menu = [
         "1. Generate Maze",
+        f"2. Perfect Maze: {perfect}",
         "X. Exit"
     ]
 
@@ -193,7 +194,7 @@ def draw_maze_menu(window: cs.window, maze_width: int,
             window.addstr(menu_y + i, menu_x, line, cs.A_BOLD)
 
 
-def draw_a_maze_ing_header(window: cs.window) -> str:
+def draw_a_maze_ing_header(window: cs.window, perfect: bool) -> str:
 
     header = """
 ******************************************************************\
@@ -238,14 +239,17 @@ __|     |_____||_____|\\____|`._____.'      *
     window.erase()
     window.nodelay(True)
     while True:
-        display_menu_with_header(window)
+        display_menu_with_header(window, perfect)
         for i, line in enumerate(lines):
             if line.strip():
                 window.addstr(start_y + i, start_x, line, cs.A_BOLD)
         window.refresh()
         try:
             key = window.getkey()
-            if key == '1' or key == 'x' or key == 'X' or key == '\x1b':
+            if (
+                key == '1' or key == '2' or key == 'x'
+                or key == 'X' or key == '\x1b'
+                 ):
                 window.nodelay(False)
                 return key
         except Exception:
@@ -502,6 +506,18 @@ def handle_maze_menu(window: cs.window, maze: generate_maze.Maze,
     return result, maze_box["maze"]
 
 
+def update_perfect_in_config(filename: str, value: bool) -> None:
+    with open(filename, "r") as f:
+        lines = f.readlines()
+
+    with open(filename, "w") as f:
+        for line in lines:
+            if line.startswith("PERFECT="):
+                f.write(f"PERFECT={value}\n")
+            else:
+                f.write(line)
+
+
 def display_maze(maze: generate_maze.Maze, config: dict) -> str:
     """
     Main function to display the complete maze on terminal.
@@ -539,9 +555,6 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
             cs.doupdate()
             time.sleep(0.01)
 
-        key = draw_a_maze_ing_header(window)
-
-        window.erase()
         maze_width = config['WIDTH']
         maze_height = config['HEIGHT']
         maze_entry = config['ENTRY']
@@ -549,6 +562,16 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
         perfect = config['PERFECT']
         color_walls = 5  # this number for white to draw walls
 
+        key = draw_a_maze_ing_header(window, perfect)
+        window.erase()
+
+        if key == "2":
+            while key not in ("1", "x", "X"):
+                perfect = not perfect
+                update_perfect_in_config("config.txt", perfect)
+                window.clear()
+                key = draw_a_maze_ing_header(window, perfect)
+                window.erase()
         if key == "1" or key in ('\n', 'KEY_ENTER'):
             first_generate_maze(window, maze, maze_entry, maze_width,
                                 maze_height, color_walls, perfect, maze_exit,
