@@ -21,6 +21,7 @@ class Cell:
         """
         self.wall = 15
         self.visited = False
+        self.pattern = False
 
 
 class Maze:
@@ -43,24 +44,24 @@ class Maze:
         if width >= 15 and height >= 15:
             s_x, s_y = int(width / 2), int(height / 2)
 
-            self.maze_struct[s_y][s_x + 1].visited = True
-            self.maze_struct[s_y][s_x + 2].visited = True
-            self.maze_struct[s_y][s_x + 3].visited = True
-            self.maze_struct[s_y][s_x - 1].visited = True
-            self.maze_struct[s_y][s_x - 2].visited = True
-            self.maze_struct[s_y][s_x - 3].visited = True
-            self.maze_struct[s_y + 1][s_x + 1].visited = True
-            self.maze_struct[s_y + 2][s_x + 1].visited = True
-            self.maze_struct[s_y + 2][s_x + 2].visited = True
-            self.maze_struct[s_y + 2][s_x + 3].visited = True
-            self.maze_struct[s_y + -1][s_x + 3].visited = True
-            self.maze_struct[s_y - 2][s_x + 1].visited = True
-            self.maze_struct[s_y - 2][s_x + 2].visited = True
-            self.maze_struct[s_y - 2][s_x + 3].visited = True
-            self.maze_struct[s_y - 1][s_x - 3].visited = True
-            self.maze_struct[s_y - 2][s_x - 3].visited = True
-            self.maze_struct[s_y + 1][s_x - 1].visited = True
-            self.maze_struct[s_y + 2][s_x - 1].visited = True
+            self.maze_struct[s_y][s_x + 1].pattern = True
+            self.maze_struct[s_y][s_x + 2].pattern = True
+            self.maze_struct[s_y][s_x + 3].pattern = True
+            self.maze_struct[s_y][s_x - 1].pattern = True
+            self.maze_struct[s_y][s_x - 2].pattern = True
+            self.maze_struct[s_y][s_x - 3].pattern = True
+            self.maze_struct[s_y + 1][s_x + 1].pattern = True
+            self.maze_struct[s_y + 2][s_x + 1].pattern = True
+            self.maze_struct[s_y + 2][s_x + 2].pattern = True
+            self.maze_struct[s_y + 2][s_x + 3].pattern = True
+            self.maze_struct[s_y + -1][s_x + 3].pattern = True
+            self.maze_struct[s_y - 2][s_x + 1].pattern = True
+            self.maze_struct[s_y - 2][s_x + 2].pattern = True
+            self.maze_struct[s_y - 2][s_x + 3].pattern = True
+            self.maze_struct[s_y - 1][s_x - 3].pattern = True
+            self.maze_struct[s_y - 2][s_x - 3].pattern = True
+            self.maze_struct[s_y + 1][s_x - 1].pattern = True
+            self.maze_struct[s_y + 2][s_x - 1].pattern = True
 
     def maze_generator(self, entry, step=None, perfect=True):
         """
@@ -71,15 +72,17 @@ class Maze:
         curent = self.maze_struct[y][x]
         curent.visited = True
 
-        random.shuffle(directions)
+        dirs = directions.copy()
+        random.shuffle(dirs)
 
-        for direction in directions:
+        for direction in dirs:
             next_x = x + x_axis[direction]
             next_y = y + y_axis[direction]
 
             if (
                 next_x < 0 or next_x >= self.width or
-                next_y < 0 or next_y >= self.height
+                next_y < 0 or next_y >= self.height or
+                self.maze_struct[next_y][next_x].pattern
             ):
                 continue
 
@@ -106,7 +109,9 @@ class Maze:
 
                 else:
                     loop_chance = 0.10
-                    if (curent.wall & bin_value[direction]) and (random.random() < loop_chance):
+                    if (
+                        curent.wall & bin_value[direction]
+                    ) and (random.random() < loop_chance):
                         curent.wall ^= bin_value[direction]
                         neighbor.wall ^= bin_value[rev_directions[direction]]
                         if step:

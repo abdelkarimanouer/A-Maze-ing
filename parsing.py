@@ -22,6 +22,12 @@ def file_parsing(file_name: str) -> dict:
                     sys.exit(1)
 
                 key, value = line.split("=")
+                key = key.upper()
+
+                if key == "" or value == "":
+                    print(f"ERROR: invalid line ({line})")
+                    sys.exit(1)
+
                 config[key.strip()] = value.strip()
 
     except FileNotFoundError as error:
