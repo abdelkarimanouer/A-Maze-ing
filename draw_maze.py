@@ -81,7 +81,7 @@ def fill_cells(window: cs.window, maze_struct: list[list],
             else:
                 attr = cs.color_pair(1)
 
-            sy = y * 3 + 1
+            sy = y * 2 + 1
             sx = x * 3 + 1
 
             window.addstr(sy,     sx,     "  ", attr)
@@ -105,7 +105,7 @@ def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
             char = get_corner_char(walls['up'], walls['down'],
                                    walls['left'], walls['right'])
 
-            screen_y = cy * 3
+            screen_y = cy * 2
             screen_x = cx * 3
             window.addstr(screen_y, screen_x, char,
                           cs.color_pair(color_walls) | cs.A_BOLD)
@@ -119,8 +119,6 @@ def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
             if walls['down'] and cy < height:
                 window.addstr(screen_y + 1, screen_x, '┃',
                               cs.color_pair(color_walls) | cs.A_BOLD)
-                window.addstr(screen_y + 2, screen_x, '┃',
-                              cs.color_pair(color_walls) | cs.A_BOLD)
 
 
 def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
@@ -130,12 +128,12 @@ def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
     Exit is marked with flag emoji 🚩.
     """
     entry_x, entry_y = entry
-    entry_screen_y = (entry_y * 3) + 1
+    entry_screen_y = (entry_y * 2) + 1
     entry_screen_x = (entry_x * 3) + 1
     window.addstr(entry_screen_y, entry_screen_x, '🏁')
 
     exit_x, exit_y = exit
-    exit_screen_y = (exit_y * 3) + 1
+    exit_screen_y = (exit_y * 2) + 1
     exit_screen_x = (exit_x * 3) + 1
     window.addstr(exit_screen_y, exit_screen_x, '🚩')
 
@@ -197,36 +195,20 @@ def draw_maze_menu(window: cs.window, maze_width: int,
 def draw_a_maze_ing_header(window: cs.window, perfect: bool) -> str:
 
     header = """
-******************************************************************\
-********************************************
-*                                                                 \
-                                           *
-*                                                                 \
-                                           *
-*           _          ____    ____       _       ________  ______\
-__       _____  ____  _____   ______       *
-*          / \\        |_   \\  /   _|     / \\     |  __   _||_\
-   __\
-  |     |_   _||_   \\|_   _|.' ___  |      *
-*         / _ \\  ______ |   \\/   |      / _ \\    |_/  / /    | |_\
- \\_|______ | |    |   \\ | | / .'   \\_|      *
-*        / ___ \\|______|| |\\  /| |     / ___ \\      .'.' _   |  _\
-| _|______|| |    | |\\ \\| | | |   ____      *
-*      _/ /   \\ \\_     _| |_\\/_| |_  _/ /   \\ \\_  _/ /__/ | _|\
- |_\
-_/ |      _| |_  _| |_\\   |_\\ `.___]  |     *
-*     |____| |____|   |_____||_____||____| |____||________||______\
-__|     |_____||_____|\\____|`._____.'      *
-*                                                                 \
-                                           *
-*                                                                 \
-                                           *
-*                                     Developed by:\
- aanouer and achouaf                                      *
-*                                                                 \
-                                           *
-******************************************************************\
-****************************************** *
+██████████████████████████████████████████████████████████████████████████████┓
+█                                                                            █┃
+█                                                                            █┃
+█     █████┓       ███┓   ███┓ █████┓ ███████┓███████┓      ██┓███┓   ██┓    █┃
+█    ██┏━━██┓      ████┓ ████┃██┏━━██┓┗━━███┏┛██┏━━━━┛      ██┃████┓  ██┃    █┃
+█    ███████┃█████┓██┏████┏██┃███████┃  ███┏┛ █████┓  █████┓██┃██┏██┓ ██┃    █┃
+█    ██┏━━██┃┗━━━━┛██┃┗██┏┛██┃██┏━━██┃ ███┏┛  ██┏━━┛  ┗━━━━┛██┃██┃┗██┓██┃    █┃
+█    ██┃  ██┃      ██┃ ┗━┛ ██┃██┃  ██┃███████┓███████┓      ██┃██┃ ┗████┃    █┃
+█    ┗━┛  ┗━┛      ┗━┛     ┗━┛┗━┛  ┗━┛┗━━━━━━┛┗━━━━━━┛      ┗━┛┗━┛  ┗━━━┛    █┃
+█                                                                            █┃
+█                            By: aanouer & achouaf                           █┃
+█                                                                            █┃
+██████████████████████████████████████████████████████████████████████████████┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 """
 
     max_y, max_x = window.getmaxyx()
@@ -296,7 +278,7 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
         if key == "x" or key == "X" or key == '\x1b':
             return False
 
-        window.addstr((y * 3) + 1, (x * 3) + 1, "  ", cs.color_pair(2))
+        window.addstr((y * 2) + 1, (x * 3) + 1, "  ", cs.color_pair(2))
 
         walls = get_cell_walls_from_struct(y, x, maze_struct)
 
@@ -311,7 +293,7 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
         elif key == "1" or key == "2" or key == "4" or key in ("R", "r"):
             return False
 
-        window.addstr((y * 3) + 1, (x * 3) + 1, "👤", cs.color_pair(2))
+        window.addstr((y * 2) + 1, (x * 3) + 1, "👤", cs.color_pair(2))
         window.refresh()
 
         if (x, y) == exit:
@@ -338,19 +320,17 @@ def animate_path(window, entry, path, delay=0.08):
         # paint corridor between old and new (THE GAP)
         if move in ("E", "W"):
             gx = min(old_x, x) * 3 + 3
-            gy = old_y * 3 + 1
+            gy = old_y * 2 + 1
             window.addstr(gy,     gx, " ", cs.color_pair(3))
-            window.addstr(gy + 1, gx, " ", cs.color_pair(3))
         else:  # N or S
-            gy = min(old_y, y) * 3 + 3
+            gy = min(old_y, y) * 2 + 2
             gx = old_x * 3 + 1
             window.addstr(gy, gx, "  ", cs.color_pair(3))
 
         # paint new cell (FULL interior 2x2)
-        sy = y * 3 + 1
+        sy = y * 2 + 1
         sx = x * 3 + 1
         window.addstr(sy,     sx, "  ", cs.color_pair(3))
-        window.addstr(sy + 1, sx, "  ", cs.color_pair(3))
 
         window.refresh()
         time.sleep(delay)
@@ -374,6 +354,8 @@ def set_colors() -> None:
     cs.init_pair(4, cs.COLOR_BLUE, cs.COLOR_BLACK)
     # white color
     cs.init_pair(5, cs.COLOR_WHITE, cs.COLOR_BLACK)
+    # red color
+    cs.init_pair(6, cs.COLOR_RED, cs.COLOR_BLACK)
 
     # Foreground default, background black
     cs.init_pair(10, -1, cs.COLOR_BLACK)
@@ -481,10 +463,12 @@ def handle_maze_menu(window: cs.window, maze: generate_maze.Maze,
                 window.refresh()
                 cs.flushinp()
         elif key == "4":
-            if color_walls == 5:
-                color_walls = 4
-            elif color_walls == 4:
+            if color_walls == 4:
                 color_walls = 5
+            elif color_walls == 5:
+                color_walls = 6
+            elif color_walls == 6:
+                color_walls = 4
             window.erase()
             draw_the_maze_from_struct(window, maze_box["maze"].maze_struct,
                                       maze_width, maze_height,
