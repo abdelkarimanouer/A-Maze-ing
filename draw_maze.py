@@ -381,10 +381,9 @@ def handle_maze_menu(window: cs.window, maze: generate_maze.Maze,
                      maze_width: int, maze_height: int,
                      maze_entry: tuple[int, int],
                      maze_exit: tuple[int, int],
-                     color_walls: int,
-                     perfect: bool,
-                     step: callable,
-                     maze_box: dict) -> tuple[str, generate_maze.Maze]:
+                     color_walls: int, perfect: bool,
+                     maze_box: dict, step=None
+                     ) -> tuple[str, generate_maze.Maze]:
 
     visible_path = False
     path = None
@@ -563,7 +562,7 @@ def display_maze(maze: generate_maze.Maze, config: dict) -> str:
             result, maze = handle_maze_menu(window, maze, maze_width,
                                             maze_height, maze_entry,
                                             maze_exit, color_walls,
-                                            perfect, step, maze_box)
+                                            perfect, maze_box, step)
     try:
         cs.wrapper(draw)
         return result
