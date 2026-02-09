@@ -1,6 +1,7 @@
 import curses as cs
 import time
 import generate_maze
+from typing import Any, Literal, Callable
 
 
 def get_cell_walls_from_struct(row: int, col: int,
@@ -301,7 +302,8 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
             return True
 
 
-def animate_path(window, entry, path, delay=0.08):
+def animate_path(window: cs.window, entry: tuple, path: Any | Literal[''],
+                 delay: float = 0.08) -> None:
     x, y = entry
 
     for move in path:
@@ -365,7 +367,7 @@ def first_generate_maze(window: cs.window, maze: generate_maze.Maze,
                         maze_entry: tuple, maze_width: int,
                         maze_height: int, color_walls: int,
                         perfect: bool,
-                        maze_exit: tuple, step=None) -> None:
+                        maze_exit: tuple, step: Callable) -> None:
     window.erase()
     maze.maze_generator(maze_entry, step, perfect)
     draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
@@ -382,7 +384,7 @@ def handle_maze_menu(window: cs.window, maze: generate_maze.Maze,
                      maze_entry: tuple[int, int],
                      maze_exit: tuple[int, int],
                      color_walls: int, perfect: bool,
-                     maze_box: dict, step=None
+                     maze_box: dict, step: Callable
                      ) -> tuple[str, generate_maze.Maze]:
 
     visible_path = False
