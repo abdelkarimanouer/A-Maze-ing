@@ -1,11 +1,12 @@
 import curses as cs
 import time
 import generate_maze
-from typing import Any, Literal, Callable
+from typing import Any, Literal, Callable, List, Dict, Tuple
 
 
 def get_cell_walls_from_struct(row: int, col: int,
-                               maze_struct: list[list]) -> dict:
+                               maze_struct: List[List[generate_maze.Cell]]
+                               ) -> Dict[str, bool]:
     """
     Same idea as get_cell_walls(), but reads from maze_struct (Cell.wall).
     """
@@ -29,7 +30,8 @@ def get_cell_walls_from_struct(row: int, col: int,
 
 
 def get_corner_walls_from_struct(cy: int, cx: int,
-                                 maze_struct: list[list]) -> dict:
+                                 maze_struct: List[List[generate_maze.Cell]]
+                                 ) -> Dict[str, bool]:
     """
     Same idea as get_corner_walls(), but reads from maze_struct.
     """
@@ -73,7 +75,7 @@ def get_corner_char(up: bool, down: bool, left: bool, right: bool) -> str:
     return char_map.get((up, down, left, right), ' ')
 
 
-def fill_cells(window: cs.window, maze_struct: list[list],
+def fill_cells(window: cs.window, maze_struct: List[List[generate_maze.Cell]],
                width: int, height: int, *, use_visited: bool) -> None:
     for y in range(height):
         for x in range(width):
@@ -89,7 +91,8 @@ def fill_cells(window: cs.window, maze_struct: list[list],
             window.addstr(sy + 1, sx,     "  ", attr)
 
 
-def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
+def draw_the_maze_from_struct(window: cs.window,
+                              maze_struct: List[List[generate_maze.Cell]],
                               width: int, height: int,
                               color_walls: int = 5,
                               use_visited: bool = True) -> None:
@@ -122,7 +125,8 @@ def draw_the_maze_from_struct(window: cs.window, maze_struct: list[list],
                               cs.color_pair(color_walls) | cs.A_BOLD)
 
 
-def draw_entry_exit(window: cs.window, entry: tuple, exit: tuple) -> None:
+def draw_entry_exit(window: cs.window, entry: Tuple[int, int],
+                    exit: Tuple[int, int]) -> None:
     """
     Places entry and exit markers on the maze.
     Entry is marked with flag emoji 🏁.
@@ -269,8 +273,10 @@ def draw_congratulations(window: cs.window) -> None:
     window.refresh()
 
 
-def player_mode(window: cs.window, entry: tuple, exit: tuple,
-                maze_struct: list[list], width: int, height: int) -> bool:
+def player_mode(window: cs.window, entry: Tuple[int, int],
+                exit: Tuple[int, int],
+                maze_struct: List[List[generate_maze.Cell]], width: int,
+                height: int) -> bool:
 
     x, y = entry
 
@@ -302,7 +308,8 @@ def player_mode(window: cs.window, entry: tuple, exit: tuple,
             return True
 
 
-def animate_path(window: cs.window, entry: tuple, path: Any | Literal[''],
+def animate_path(window: cs.window, entry: Tuple[int, int],
+                 path: Any | Literal[''],
                  delay: float = 0.08) -> None:
     x, y = entry
 
@@ -364,10 +371,11 @@ def set_colors() -> None:
 
 
 def first_generate_maze(window: cs.window, maze: generate_maze.Maze,
-                        maze_entry: tuple, maze_width: int,
+                        maze_entry: Tuple[int, int], maze_width: int,
                         maze_height: int, color_walls: int,
                         perfect: bool,
-                        maze_exit: tuple, step: Callable) -> None:
+                        maze_exit: Tuple[int, int],
+                        step: Callable[[], None]) -> None:
     window.erase()
     maze.maze_generator(maze_entry, step, perfect)
     draw_the_maze_from_struct(window, maze.maze_struct, maze_width,
@@ -381,11 +389,12 @@ def first_generate_maze(window: cs.window, maze: generate_maze.Maze,
 
 def handle_maze_menu(window: cs.window, maze: generate_maze.Maze,
                      maze_width: int, maze_height: int,
-                     maze_entry: tuple[int, int],
-                     maze_exit: tuple[int, int],
+                     maze_entry: Tuple[int, int],
+                     maze_exit: Tuple[int, int],
                      color_walls: int, perfect: bool,
-                     maze_box: dict, step: Callable
-                     ) -> tuple[str, generate_maze.Maze]:
+                     maze_box: Dict[str, generate_maze.Maze],
+                     step: Callable[[], None]
+                     ) -> Tuple[str, generate_maze.Maze]:
 
     visible_path = False
     path = None
@@ -503,7 +512,7 @@ def update_perfect_in_config(filename: str, value: bool) -> None:
                 f.write(line)
 
 
-def display_maze(maze: generate_maze.Maze, config: dict) -> str:
+def display_maze(maze: generate_maze.Maze, config: Dict["str", Any]) -> str:
     """
     Main function to display the complete maze on terminal.
     Uses curses library to draw header and the maze with walls and markers.
