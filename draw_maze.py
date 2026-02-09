@@ -5,6 +5,12 @@ from typing import Any, Literal, Callable, List, Dict, Tuple
 
 
 class DrawMaze:
+
+    """
+    Collection of static helper methods for drawing and interacting
+    with the maze using curses.
+    """
+
     @staticmethod
     def get_cell_walls_from_struct(row: int, col: int,
                                    maze_struct: List[List[generate_maze.Cell]]
@@ -88,6 +94,9 @@ class DrawMaze:
                    maze_struct: List[List[generate_maze.Cell]],
                    width: int, height: int, *,
                    use_visited: bool) -> None:
+
+        """ this method to fill cells with white or black"""
+
         for y in range(height):
             for x in range(width):
                 if use_visited and maze_struct[y][x].visited:
@@ -209,6 +218,9 @@ class DrawMaze:
 
     @staticmethod
     def draw_a_maze_ing_header(window: cs.window, perfect: bool) -> str:
+
+        """ this method for show the header A-Maze-Ing """
+
         header = """
 ██████████████████████████████████████████████████████████████████████████████┓
 █                                                                            █┃
@@ -254,6 +266,10 @@ class DrawMaze:
 
     @staticmethod
     def draw_congratulations(window: cs.window) -> None:
+
+        """ this method for show the congratulation
+        header after player win """
+
         header = """
  ██████╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗  █████╗ ████████╗██╗   ██╗██╗\
       █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
@@ -286,6 +302,9 @@ class DrawMaze:
                     exit: Tuple[int, int],
                     maze_struct: List[List[generate_maze.Cell]], width: int,
                     height: int) -> bool:
+
+        """ this method showed player mode so the user
+        can move the player to the exit by arrows """
 
         x, y = entry
 
@@ -320,6 +339,8 @@ class DrawMaze:
     def animate_path(window: cs.window, entry: Tuple[int, int],
                      path: Any | Literal[''],
                      delay: float = 0.08) -> None:
+
+        """ this method for draw path with animation """
         x, y = entry
 
         for move in path:
@@ -355,6 +376,9 @@ class DrawMaze:
 
     @staticmethod
     def set_colors() -> None:
+
+        """ this method for set colors to use them later in the maze"""
+
         cs.start_color()
         cs.use_default_colors()
 
@@ -373,6 +397,9 @@ class DrawMaze:
                             perfect: bool,
                             maze_exit: Tuple[int, int],
                             step: Callable[[], None]) -> None:
+
+        """ this method for generate method for the first time"""
+
         window.erase()
         maze.maze_generator(maze_entry, step, perfect)
         DrawMaze.draw_the_maze(window, maze.maze_struct,
@@ -392,6 +419,9 @@ class DrawMaze:
                          maze_box: Dict[str, generate_maze.Maze],
                          step: Callable[[], None]
                          ) -> Tuple[str, generate_maze.Maze]:
+
+        """ this method to handle and show the correct
+        thing that user choose """
 
         visible_path = False
         path = None
@@ -500,6 +530,8 @@ class DrawMaze:
 
     @staticmethod
     def update_perfect_in_config(filename: str, value: bool) -> None:
+
+        """ this method for update the config file """
         with open(filename, "r") as f:
             lines = f.readlines()
 
