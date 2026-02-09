@@ -32,6 +32,7 @@ class Maze:
     """
 
     def __init__(self, width: int, height: int, seed: int) -> None:
+
         """
         Creates a new maze with given size.
         Fills the maze with cell objects.

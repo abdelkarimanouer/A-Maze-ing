@@ -1,5 +1,4 @@
 import sys
-import random
 
 
 def file_parsing(file_name: str) -> dict:
@@ -45,8 +44,9 @@ def config_parsing(config: dict) -> dict:
     """
     try:
         config["SEED"] = config["SEED"]
+        config["SEED_EXIST"] = True
     except Exception:
-        config["SEED"] = random.randint(1, 100)
+        config["SEED_EXIST"] = False
 
     try:
         config["WIDTH"] = int(config["WIDTH"])
