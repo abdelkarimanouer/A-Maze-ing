@@ -1,4 +1,5 @@
 import sys
+import random
 
 
 def file_parsing(file_name: str) -> dict:
@@ -43,11 +44,18 @@ def config_parsing(config: dict) -> dict:
     Exits if any value is wrong or missing.
     """
     try:
+        config["SEED"] = config["SEED"]
+    except Exception:
+        config["SEED"] = random.randint(1, 100)
+
+    try:
         config["WIDTH"] = int(config["WIDTH"])
         config["HEIGHT"] = int(config["HEIGHT"])
 
         config["ENTRY"] = tuple(map(int, config["ENTRY"].split(",")))
         config["EXIT"] = tuple(map(int, config["EXIT"].split(",")))
+
+        config["OUTPUT_FILE"] = config["OUTPUT_FILE"]
 
         value = config["PERFECT"].upper()
         if value == "TRUE":
@@ -63,6 +71,9 @@ def config_parsing(config: dict) -> dict:
         sys.exit(1)
     except KeyError as error:
         print(f"ERROR: Key {error} not found")
+        sys.exit(1)
+    except Exception as error:
+        print(f"ERROR: {error}")
         sys.exit(1)
 
     if config["WIDTH"] <= 0 or config["HEIGHT"] <= 0:

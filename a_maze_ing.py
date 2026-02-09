@@ -18,7 +18,9 @@ def main():
     config = config_parsing(configuration)
 
     while True:
-        maze = generate_maze.Maze(config["WIDTH"], config["HEIGHT"])
+        maze = generate_maze.Maze(
+            config["WIDTH"], config["HEIGHT"], config["SEED"]
+        )
 
         result = display_maze(maze, config)
         if result == "done":

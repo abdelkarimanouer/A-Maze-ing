@@ -1,5 +1,6 @@
 import random
 from collections import deque
+from typing import Optional, Callable
 
 bin_value = {'n': 1, 'e': 2, 's': 4, 'w': 8}
 directions = ['s', 'w', 'n', 'e']
@@ -14,7 +15,7 @@ class Cell:
     Each cell has walls and a visited status.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Creates a new cell.
         Sets all 4 walls and marks cell as not visited.
@@ -30,7 +31,7 @@ class Maze:
     Contains cells and methods to generate the maze.
     """
 
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int, seed: int) -> None:
         """
         Creates a new maze with given size.
         Fills the maze with cell objects.
@@ -40,6 +41,8 @@ class Maze:
         self.maze_struct = [
             [Cell() for w in range(width)] for h in range(height)
         ]
+
+        random.seed(seed)
 
         if width >= 15 and height >= 15:
             s_x, s_y = int(width / 2), int(height / 2)
@@ -63,7 +66,11 @@ class Maze:
             self.maze_struct[s_y + 1][s_x - 1].pattern = True
             self.maze_struct[s_y + 2][s_x - 1].pattern = True
 
-    def maze_generator(self, entry, step=None, perfect=True):
+    def maze_generator(
+            self,
+            entry: tuple,
+            step: Optional[Callable] = None,
+            perfect: bool = True) -> None:
         """
         Generates the maze using recursive backtracking.
         Starts from entry point and carves paths randomly.
@@ -96,7 +103,7 @@ class Maze:
                     ]
                     if step:
                         step()
-                    self.maze_generator([next_x, next_y], step, perfect)
+                    self.maze_generator((next_x, next_y), step, perfect)
             elif perfect is False:
                 neighbor = self.maze_struct[next_y][next_x]
 
@@ -105,7 +112,7 @@ class Maze:
                     neighbor.wall ^= bin_value[rev_directions[direction]]
                     if step:
                         step()
-                    self.maze_generator([next_x, next_y], step, perfect)
+                    self.maze_generator((next_x, next_y), step, perfect)
 
                 else:
                     loop_chance = 0.10
@@ -117,9 +124,12 @@ class Maze:
                         if step:
                             step()
 
-    def maze_solver(self, entry, exit):
+    def maze_solver(self, entry: tuple, exit: tuple) -> str:
         frontier = deque([entry])
-        came_from = {entry: None}
+        came_from: dict[
+            tuple[int, int],
+            Optional[tuple[tuple[int, int], str]]
+        ] = {entry: None}
         while frontier:
             x, y = frontier.popleft()
 
@@ -143,8 +153,12 @@ class Maze:
         path = ""
         curent = exit
 
-        while came_from[curent] is not None:
-            curent, move = came_from[curent]
+        while True:
+            value = came_from[curent]
+            if value is None:
+                break
+
+            curent, move = value
             path = move + path
 
         return path
