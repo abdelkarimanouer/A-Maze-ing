@@ -2,3 +2,5 @@ __pycache__/
 .mypy_cache/
 .vscode/
 maze.txt
+dist/
+src/a_mize_ing.egg-info/
