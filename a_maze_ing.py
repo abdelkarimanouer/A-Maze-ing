@@ -1,7 +1,8 @@
 import sys
-from parsing import file_parsing, config_parsing
-from draw_maze import display_maze
-import generate_maze
+from src import file_parsing, config_parsing
+from src import display_maze
+import src.generate_maze as generate_maze
+import random
 
 
 def main():
@@ -18,6 +19,8 @@ def main():
     config = config_parsing(configuration)
 
     while True:
+        if config["SEED_EXIST"] is False:
+            config["SEED"] = random.randint(1, 100)
         maze = generate_maze.Maze(
             config["WIDTH"], config["HEIGHT"], config["SEED"]
         )
