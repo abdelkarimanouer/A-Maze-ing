@@ -2,6 +2,7 @@ import curses as cs
 import time
 from . import generate_maze
 from typing import Any, Literal, Callable, List, Dict, Tuple
+import random
 
 
 class DrawMaze:
@@ -417,7 +418,8 @@ class DrawMaze:
                          maze_exit: Tuple[int, int],
                          color_walls: int, perfect: bool,
                          maze_box: Dict[str, generate_maze.Maze],
-                         step: Callable[[], None]
+                         step: Callable[[], None],
+                         seed: int, seed_exist: bool
                          ) -> Tuple[str, generate_maze.Maze]:
 
         """ this method to handle and show the correct
@@ -431,7 +433,9 @@ class DrawMaze:
         while True:
             key = window.getkey()
             if key in ('R', 'r'):
-                n_maze = generate_maze.Maze(maze_width, maze_height)
+                if seed_exist is False:
+                    seed = random.randint(1, 100)
+                n_maze = generate_maze.Maze(maze_width, maze_height, seed)
                 maze_box["maze"] = n_maze
 
                 maze = n_maze
@@ -604,7 +608,9 @@ def display_maze(maze: generate_maze.Maze, config: Dict["str", Any]) -> str:
             result, maze = DrawMaze.handle_maze_menu(window, maze, maze_width,
                                                      maze_height, maze_entry,
                                                      maze_exit, color_walls,
-                                                     perfect, maze_box, step)
+                                                     perfect, maze_box, step,
+                                                     config["SEED"],
+                                                     config["SEED_EXIST"])
 
     try:
         cs.wrapper(draw)
