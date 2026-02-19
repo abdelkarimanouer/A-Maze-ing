@@ -1,7 +1,7 @@
 import sys
-from src import file_parsing, config_parsing
-from src import display_maze
-import src.generate_maze as generate_maze
+from src.mazegen import file_parsing, config_parsing
+from src.mazegen import display_maze
+import src.mazegen.generate_maze as generate_maze
 import random
 
 
