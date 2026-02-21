@@ -1,6 +1,6 @@
 import curses as cs
 import time
-from src.mazegen import generate_maze
+from mazegen import generate_maze
 from typing import Any, Literal, Callable, List, Dict, Tuple
 import random
 

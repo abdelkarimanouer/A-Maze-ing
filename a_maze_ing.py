@@ -1,11 +1,11 @@
 import sys
-from src.mazegen import file_parsing, config_parsing
-from src.mazegen import display_maze
-import src.mazegen.generate_maze as generate_maze
+from mazegen import file_parsing, config_parsing
+from mazegen import display_maze
+import mazegen.generate_maze as generate_maze
 import random
 
 
-def main():
+def main() -> None:
     """
     Main program entry point.
     Reads config, generates mazes in loop, displays them until user exits.
