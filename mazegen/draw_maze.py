@@ -520,12 +520,9 @@ class DrawMaze:
                 DrawMaze.draw_entry_exit(window, maze_entry, maze_exit)
                 DrawMaze.draw_maze_menu(window, maze_width, maze_height)
                 if path is not None:
-                    DrawMaze.animate_path(window, maze_entry, path, 0)
-                    DrawMaze.draw_entry_exit(window, maze_entry, maze_exit)
-                    visible_path = True
-                else:
-                    visible_path = False
-
+                    if visible_path is True:
+                        DrawMaze.animate_path(window, maze_entry, path, 0)
+                        DrawMaze.draw_entry_exit(window, maze_entry, maze_exit)
                 window.refresh()
                 cs.flushinp()
             elif key == "x" or key == "X" or key == '\x1b':
