@@ -45,8 +45,9 @@ class Maze:
 
         random.seed(seed)
 
-        if width >= 15 and height >= 15:
-            s_x, s_y = int(width / 2), int(height / 2)
+    def pattern_42(self) -> None:
+        if self.width >= 15 and self.height >= 15:
+            s_x, s_y = int(self.width / 2), int(self.height / 2)
 
             self.maze_struct[s_y][s_x + 1].pattern = True
             self.maze_struct[s_y][s_x + 2].pattern = True

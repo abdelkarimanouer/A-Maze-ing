@@ -444,6 +444,7 @@ class DrawMaze:
                 color_walls = 5
 
                 window.erase()
+                maze_box["maze"].pattern_42()
                 maze_box["maze"].maze_generator(maze_entry, step, perfect)
 
                 window.erase()

@@ -109,4 +109,7 @@ def config_parsing(config: dict) -> dict:
         print("ERROR: ENTRY and EXIT is the same")
         sys.exit(1)
 
+    if config["WIDTH"] < 15 or config["HEIGHT"] < 15:
+        print("the maze is too small for 42_Pattern")
+
     return config
