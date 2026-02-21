@@ -3,4 +3,3 @@ __pycache__/
 .vscode/
 maze.txt
 dist/
-src/a_mize_ing.egg-info/
