@@ -49,6 +49,10 @@ def main() -> None:
         exit()
     except KeyboardInterrupt:
         print("You pressed Ctrl + C and the program Stopping safely")
+    except RecursionError:
+        print("Recursion limit reached!")
+    except Exception as error:
+        print(error)
 
 
 if __name__ == "__main__":
